@@ -1,38 +1,75 @@
-# Meridian
+# Nuxt Minimal Starter
 
-Day planner personnel avec timeline journalière et matrice de priorités Eisenhower.
+Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
-## Stack
+## Setup
 
-- **Nuxt 3** - Framework fullstack
-- **Tailwind CSS** - Styling
-- **Pinia** - State management
-- **TypeScript** - Typage strict
-
-## Lancer le projet
+Make sure to install dependencies:
 
 ```bash
+# npm
 npm install
-npm run dev
+
+# pnpm
+pnpm install
+
+# yarn
+yarn install
+
+# bun
+bun install
 ```
 
-## Déployer
+## Development Server
+
+Start the development server on `http://localhost:3000`:
 
 ```bash
-docker-compose up -d
+# npm
+npm run dev
+
+# pnpm
+pnpm dev
+
+# yarn
+yarn dev
+
+# bun
+bun run dev
 ```
 
-## Structure
+## Production
 
+Build the application for production:
+
+```bash
+# npm
+npm run build
+
+# pnpm
+pnpm build
+
+# yarn
+yarn build
+
+# bun
+bun run build
 ```
-components/   Composants UI découpés par domaine
-composables/  Logique réutilisable
-stores/       State Pinia (events, matrix, tags)
-pages/        timeline.vue / matrix.vue
-types/        Interfaces TypeScript
-docs/         Maquette HTML de référence
+
+Locally preview production build:
+
+```bash
+# npm
+npm run preview
+
+# pnpm
+pnpm preview
+
+# yarn
+yarn preview
+
+# bun
+bun run preview
 ```
 
-## Conventions
-
-Commits au format [Conventional Commits](https://www.conventionalcommits.org/), principes SOLID et KISS. Voir `CLAUDE.md` pour le détail.
+Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
