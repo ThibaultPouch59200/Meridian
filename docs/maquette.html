@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black: #0d0d0d;
+  --gray-900: #1a1a1a;
+  --gray-600: #666;
+  --gray-400: #aaa;
+  --gray-200: #ddd;
+  --gray-100: #f0f0ee;
+  --gray-50: #f8f8f6;
+  --white: #ffffff;
+  --sidebar-w: 52px;
+}
+
+html, body { width: 100%; height: 100%; overflow: hidden; background: var(--gray-50); }
+
+body {
+  font-family: 'Instrument Sans', sans-serif;
+  color: var(--black);
+  display: flex;
+}
+
+/* ================================
+   SIDEBAR
+================================ */
+.sidebar {
+  width: var(--sidebar-w);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.sidebar::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 1px;
+  height: 140px;
+  background: var(--gray-200);
+}
+
+.nav-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background 0.15s;
+  position: relative;
+  z-index: 1;
+  color: var(--gray-400);
+}
+
+.nav-btn:hover { background: var(--gray-100); color: var(--black); }
+.nav-btn.active { color: var(--black); background: var(--white); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+.nav-btn svg { width: 18px; height: 18px; stroke-width: 1.4; }
+
+/* ================================
+   APP WRAPPER
+================================ */
+.app {
+  flex: 1;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-left: 1px solid var(--gray-200);
+  background: var(--white);
+}
+
+.page { display: none; flex-direction: column; height: 100%; }
+.page.active { display: flex; }
+
+/* ================================
+   SHARED HEADER
+================================ */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px 14px 24px;
+  border-bottom: 1px solid var(--gray-200);
+  flex-shrink: 0;
+}
+
+.app-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.page-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.header-btn {
+  padding: 5px 10px;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+  color: var(--gray-600);
+  transition: all 0.15s;
+}
+.header-btn:hover { background: var(--gray-50); color: var(--black); }
+.header-btn.active { background: var(--black); color: var(--white); border-color: var(--black); }
+
+.header-date-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.date-label {
+  font-size: 13px;
+  font-weight: 500;
+  min-width: 160px;
+  text-align: center;
+}
+
+.icon-btn {
+  width: 28px; height: 28px;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gray-600);
+  transition: all 0.15s;
+}
+.icon-btn:hover { background: var(--gray-50); color: var(--black); }
+.icon-btn svg { width: 14px; height: 14px; stroke-width: 1.8; }
+
+.today-btn {
+  padding: 5px 12px;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+  color: var(--gray-600);
+  transition: all 0.15s;
+  letter-spacing: 0.3px;
+}
+.today-btn:hover { background: var(--gray-50); color: var(--black); }
+
+.add-event-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--black);
+  color: var(--white);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: opacity 0.15s;
+}
+.add-event-btn:hover { opacity: 0.85; }
+.add-event-btn svg { width: 13px; height: 13px; stroke-width: 2; }
+
+/* ================================
+   TIMELINE PAGE
+================================ */
+#page-timeline { overflow: hidden; }
+
+.timeline-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.timeline-scroll::-webkit-scrollbar { width: 4px; }
+.timeline-scroll::-webkit-scrollbar-track { background: transparent; }
+.timeline-scroll::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 2px; }
+
+.timeline-grid {
+  position: relative;
+  min-height: 100%;
+}
+
+.hour-row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--gray-100);
+  position: relative;
+  min-height: 56px;
+}
+
+.hour-row:hover { background: rgba(0,0,0,0.01); }
+
+.hour-row.drag-over { background: rgba(0,0,0,0.03); }
+
+.hour-label {
+  width: 64px;
+  flex-shrink: 0;
+  padding: 8px 16px 0 24px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--gray-400);
+  letter-spacing: 0.3px;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+
+.hour-cells {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.quarter-lines {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.quarter-line {
+  flex: 1;
+  border-bottom: 1px solid var(--gray-100);
+}
+.quarter-line:last-child { border-bottom: none; }
+
+.events-lane {
+  position: relative;
+  z-index: 1;
+  padding: 4px 16px 4px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-height: 48px;
+}
+
+/* drag selection */
+.drag-selection {
+  position: fixed;
+  background: rgba(13,13,13,0.06);
+  border: 1.5px dashed var(--gray-400);
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* EVENT BAR */
+.event-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  position: relative;
+  min-height: 28px;
+  border-left: 3px solid currentColor;
+}
+
+.event-bar:hover { opacity: 0.85; transform: translateX(1px); }
+
+.event-time {
+  font-size: 10px;
+  font-weight: 500;
+  opacity: 0.7;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.event-name {
+  font-size: 12px;
+  font-weight: 500;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-tag {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  opacity: 0.65;
+  padding: 2px 6px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.35);
+}
+
+.event-delete {
+  width: 16px; height: 16px;
+  border: none;
+  background: rgba(255,255,255,0.35);
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+  color: inherit;
+}
+.event-bar:hover .event-delete { opacity: 1; }
+.event-delete svg { width: 10px; height: 10px; stroke-width: 2; }
+
+/* ================================
+   MONTH VIEW
+================================ */
+#page-timeline.month-mode .timeline-scroll { display: none; }
+#page-timeline.month-mode .month-view { display: grid; }
+
+.month-view {
+  display: none;
+  grid-template-rows: auto 1fr;
+  flex: 1;
+  overflow: hidden;
+  padding: 20px 24px;
+  gap: 12px;
+}
+
+.month-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0;
+}
+
+.weekday-label {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  padding: 6px 0;
+}
+
+.month-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  gap: 1px;
+  background: var(--gray-200);
+  border: 1px solid var(--gray-200);
+  overflow: hidden;
+}
+
+.month-day {
+  background: var(--white);
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: background 0.12s;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.month-day:hover { background: var(--gray-50); }
+.month-day.other-month { background: var(--gray-50); }
+.month-day.other-month .day-num { color: var(--gray-300); }
+.month-day.today .day-num {
+  background: var(--black);
+  color: var(--white);
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 600;
+}
+.month-day.selected { background: #fafafa; outline: 2px solid var(--black); outline-offset: -2px; }
+
+.day-num {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 22px;
+  color: var(--black);
+}
+
+.month-event-dot {
+  height: 4px;
+  border-radius: 2px;
+  width: 100%;
+}
+
+.month-events-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.month-event-pill {
+  font-size: 9px;
+  font-weight: 500;
+  padding: 1px 5px;
+  border-radius: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.85;
+}
+
+/* ================================
+   MATRIX PAGE
+================================ */
+#page-matrix {
+  overflow: hidden;
+}
+
+.matrix-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr 190px;
+  grid-template-rows: 1fr 1fr;
+  min-height: 0;
+  padding: 0 24px;
+  position: relative;
+}
+
+.matrix-axis-label {
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.quadrant {
+  border: 1px solid var(--gray-200);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.quadrant.q-inu { border-right: none; border-bottom: none; }
+.quadrant.q-iu  { border-bottom: none; }
+.quadrant.q-ninu { border-right: none; }
+.quadrant.q-niu { }
+
+.tasks-col {
+  border: 1px solid var(--gray-200);
+  border-left: none;
+  padding: 12px 14px;
+  grid-row: span 2;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.q-header {
+  margin-bottom: 8px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--gray-200);
+  flex-shrink: 0;
+}
+
+.q-title {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--black);
+}
+
+.q-sub {
+  font-size: 9px;
+  color: var(--gray-400);
+  margin-top: 1px;
+  font-style: italic;
+}
+
+.q-list {
+  flex: 1;
+  overflow-y: auto;
+}
+.q-list::-webkit-scrollbar { width: 3px; }
+.q-list::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 2px; }
+
+.q-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 0;
+}
+
+.checkbox {
+  width: 13px; height: 13px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 50%;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.checkbox:checked { background: var(--black); border-color: var(--black); }
+.checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 2.5px; top: 0.5px;
+  width: 4px; height: 7px;
+  border: 1.5px solid white;
+  border-top: none; border-left: none;
+  transform: rotate(45deg);
+}
+
+.q-input {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 11px;
+  border: none; outline: none;
+  background: transparent;
+  color: var(--black);
+  flex: 1; padding: 0;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s;
+}
+.q-input:focus { border-bottom-color: var(--gray-200); }
+.q-input::placeholder { color: var(--gray-200); }
+.q-input.done { text-decoration: line-through; color: var(--gray-400); }
+
+.add-task-btn {
+  font-size: 10px;
+  color: var(--gray-300);
+  cursor: pointer;
+  padding: 3px 0 0;
+  transition: color 0.15s;
+  background: none; border: none;
+  font-family: 'Instrument Sans', sans-serif;
+  flex-shrink: 0;
+  text-align: left;
+}
+.add-task-btn:hover { color: var(--gray-600); }
+
+.urgency-bar {
+  grid-column: 1 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gray-300);
+  font-weight: 600;
+  padding: 4px 0;
+  border-top: 1px solid var(--gray-200);
+  flex-shrink: 0;
+}
+
+.matrix-bottom {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 1fr 190px;
+  border-top: 1px solid var(--gray-200);
+  height: 120px;
+  padding: 0 24px;
+}
+
+.notes-section {
+  padding: 10px 14px;
+  border-right: 1px solid var(--gray-200);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.section-label {
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--gray-400);
+  flex-shrink: 0;
+}
+
+.notes-area {
+  width: 100%; flex: 1;
+  resize: none; border: none; outline: none;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 11px;
+  color: var(--black);
+  line-height: 1.8;
+  background: transparent;
+  margin-top: 6px;
+}
+.notes-area::placeholder { color: var(--gray-200); }
+
+.matrix-tomorrow {
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.matrix-tomorrow .q-list { flex: 1; }
+
+/* ================================
+   POPUP / MODAL
+================================ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.18);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.overlay.open { display: flex; }
+
+.modal {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 6px;
+  width: 440px;
+  padding: 28px 28px 24px;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  animation: modalIn 0.15s ease;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(6px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px; right: 16px;
+  width: 26px; height: 26px;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gray-400);
+  transition: all 0.15s;
+}
+.modal-close:hover { color: var(--black); background: var(--gray-50); }
+.modal-close svg { width: 12px; height: 12px; stroke-width: 2; }
+
+.modal h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 20px;
+  letter-spacing: -0.2px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 14px;
+}
+
+.form-row.two-col {
+  flex-direction: row;
+  gap: 12px;
+}
+.form-row.two-col .form-row {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.form-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--gray-400);
+}
+
+.form-input {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 13px;
+  border: 1px solid var(--gray-200);
+  border-radius: 3px;
+  padding: 7px 10px;
+  outline: none;
+  color: var(--black);
+  background: var(--white);
+  transition: border-color 0.15s;
+  width: 100%;
+}
+.form-input:focus { border-color: var(--black); }
+.form-input::placeholder { color: var(--gray-300); }
+
+textarea.form-input {
+  resize: none;
+  height: 60px;
+  line-height: 1.5;
+}
+
+.color-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.color-swatch {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.1s, border-color 0.1s;
+  flex-shrink: 0;
+}
+.color-swatch:hover { transform: scale(1.1); }
+.color-swatch.selected { border-color: var(--black); transform: scale(1.08); }
+
+.tag-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tag-chip {
+  padding: 4px 10px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  border: 1px solid var(--gray-200);
+  background: none;
+  color: var(--gray-600);
+  font-family: 'Instrument Sans', sans-serif;
+  transition: all 0.12s;
+}
+.tag-chip:hover { border-color: var(--black); color: var(--black); }
+.tag-chip.selected { background: var(--black); color: var(--white); border-color: var(--black); }
+
+.tag-chip.add-tag-chip {
+  border-style: dashed;
+  display: flex; align-items: center; gap: 4px;
+}
+
+.tag-input-inline {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 10px;
+  border: 1px dashed var(--gray-200);
+  border-radius: 3px;
+  padding: 4px 8px;
+  outline: none;
+  width: 100px;
+  color: var(--black);
+  background: var(--white);
+  transition: border-color 0.15s;
+  display: none;
+}
+.tag-input-inline.visible { display: block; }
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--gray-100);
+}
+
+.btn-cancel {
+  padding: 7px 16px;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 12px;
+  border: 1px solid var(--gray-200);
+  border-radius: 3px;
+  background: none;
+  cursor: pointer;
+  color: var(--gray-600);
+  transition: all 0.12s;
+}
+.btn-cancel:hover { background: var(--gray-50); }
+
+.btn-save {
+  padding: 7px 20px;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 12px;
+  background: var(--black);
+  color: var(--white);
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: opacity 0.12s;
+}
+.btn-save:hover { opacity: 0.85; }
+
+/* current time line */
+.current-time-line {
+  position: absolute;
+  left: 64px; right: 0;
+  height: 1.5px;
+  background: #e05555;
+  pointer-events: none;
+  z-index: 5;
+}
+.current-time-line::before {
+  content: '';
+  position: absolute;
+  left: -4px; top: -3px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #e05555;
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <button class="nav-btn active" id="nav-timeline" onclick="showPage('timeline')" title="Timeline">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+    </svg>
+  </button>
+  <button class="nav-btn" id="nav-matrix" onclick="showPage('matrix')" title="Matrice">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/>
+    </svg>
+  </button>
+</nav>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- ======================== TIMELINE PAGE ======================== -->
+  <div id="page-timeline" class="page active">
+    <div class="app-header">
+      <div class="app-header-left">
+        <span class="page-title">Timeline</span>
+        <div class="header-nav">
+          <button class="header-btn active" id="btn-day" onclick="setTimelineMode('day')">Jour</button>
+          <button class="header-btn" id="btn-month" onclick="setTimelineMode('month')">Mois</button>
+        </div>
+        <div class="header-date-nav">
+          <button class="icon-btn" onclick="navigateDate(-1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <span class="date-label" id="date-label"></span>
+          <button class="icon-btn" onclick="navigateDate(1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <button class="today-btn" onclick="goToday()">Aujourd'hui</button>
+        </div>
+      </div>
+      <button class="add-event-btn" onclick="openModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Ajouter
+      </button>
+    </div>
+
+    <!-- DAY TIMELINE -->
+    <div class="timeline-scroll" id="timeline-scroll">
+      <div class="timeline-grid" id="timeline-grid">
+        <div class="current-time-line" id="time-line"></div>
+      </div>
+    </div>
+
+    <!-- MONTH VIEW -->
+    <div class="month-view" id="month-view">
+      <div class="month-weekdays">
+        <div class="weekday-label">Lun</div>
+        <div class="weekday-label">Mar</div>
+        <div class="weekday-label">Mer</div>
+        <div class="weekday-label">Jeu</div>
+        <div class="weekday-label">Ven</div>
+        <div class="weekday-label">Sam</div>
+        <div class="weekday-label">Dim</div>
+      </div>
+      <div class="month-days" id="month-days"></div>
+    </div>
+  </div>
+
+  <!-- ======================== MATRIX PAGE ======================== -->
+  <div id="page-matrix" class="page">
+    <div class="app-header">
+      <span class="page-title">Priority Matrix</span>
+      <div class="header-date-nav">
+        <span class="date-label" id="matrix-date" style="font-size:12px;color:var(--gray-400);min-width:auto;"></span>
+      </div>
+    </div>
+
+    <div class="matrix-body">
+      <div class="matrix-axis-label">IMPORTANCE</div>
+
+      <div class="quadrant q-inu">
+        <div class="q-header"><div class="q-title">Important, Not Urgent</div><div class="q-sub">Décider quand faire</div></div>
+        <div class="q-list" id="list-inu"></div>
+        <button class="add-task-btn" onclick="addTask('inu')">+ ajouter</button>
+      </div>
+
+      <div class="quadrant q-iu">
+        <div class="q-header"><div class="q-title">Important &amp; Urgent</div><div class="q-sub">Faire immédiatement</div></div>
+        <div class="q-list" id="list-iu"></div>
+        <button class="add-task-btn" onclick="addTask('iu')">+ ajouter</button>
+      </div>
+
+      <div class="tasks-col">
+        <div class="q-header"><div class="q-title">Tasks for Today</div></div>
+        <div class="q-list" id="list-today"></div>
+        <button class="add-task-btn" onclick="addTask('today')">+ ajouter</button>
+      </div>
+
+      <div class="quadrant q-ninu">
+        <div class="q-header"><div class="q-title">Not Important &amp; Not Urgent</div><div class="q-sub">Faire plus tard</div></div>
+        <div class="q-list" id="list-ninu"></div>
+        <button class="add-task-btn" onclick="addTask('ninu')">+ ajouter</button>
+      </div>
+
+      <div class="quadrant q-niu">
+        <div class="q-header"><div class="q-title">Not Important &amp; Urgent</div><div class="q-sub">Déléguer</div></div>
+        <div class="q-list" id="list-niu"></div>
+        <button class="add-task-btn" onclick="addTask('niu')">+ ajouter</button>
+      </div>
+
+      <div class="urgency-bar">
+        <span style="font-size:14px;line-height:1">&#8722;</span>
+        URGENCY
+        <span style="font-size:14px;line-height:1">+</span>
+      </div>
+    </div>
+
+    <div class="matrix-bottom">
+      <div class="notes-section">
+        <div class="section-label">Notes + Ideas</div>
+        <textarea class="notes-area" id="matrix-notes" placeholder="Idées, réflexions, références..."></textarea>
+      </div>
+      <div class="matrix-tomorrow">
+        <div class="q-header"><div class="q-title">Tasks for Tomorrow</div></div>
+        <div class="q-list" id="list-tomorrow"></div>
+        <button class="add-task-btn" onclick="addTask('tomorrow')">+ ajouter</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <h2 id="modal-title">Nouvel événement</h2>
+
+    <div class="form-row">
+      <label class="form-label">Nom</label>
+      <input class="form-input" id="ev-name" type="text" placeholder="Réunion, déjeuner, sport...">
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Description</label>
+      <textarea class="form-input" id="ev-desc" placeholder="Optionnel..."></textarea>
+    </div>
+
+    <div class="form-row two-col">
+      <div class="form-row">
+        <label class="form-label">Début</label>
+        <input class="form-input" id="ev-start" type="datetime-local">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Fin</label>
+        <input class="form-input" id="ev-end" type="datetime-local">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Lieu</label>
+      <input class="form-input" id="ev-location" type="text" placeholder="Bureau, maison, en ligne...">
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Couleur</label>
+      <div class="color-row" id="color-row"></div>
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Tag</label>
+      <div class="tag-row" id="tag-row">
+        <button class="tag-chip selected" data-tag="Perso" onclick="selectTag(this)">Perso</button>
+        <button class="tag-chip" data-tag="Travail" onclick="selectTag(this)">Travail</button>
+        <button class="tag-chip add-tag-chip" onclick="showTagInput()">+ Tag</button>
+        <input class="tag-input-inline" id="tag-input-inline" type="text" placeholder="Nouveau tag..." maxlength="20" onkeydown="confirmTag(event)">
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+      <button class="btn-save" onclick="saveEvent()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =============================================
+// STATE
+// =============================================
+const COLORS = ['#4a90d9','#e05555','#3bb87a','#f0a832','#9b72d0','#e08040','#5ab8c4','#888'];
+const COLOR_LIGHT = {
+  '#4a90d9':'rgba(74,144,217,0.12)',
+  '#e05555':'rgba(224,85,85,0.12)',
+  '#3bb87a':'rgba(59,184,122,0.12)',
+  '#f0a832':'rgba(240,168,50,0.12)',
+  '#9b72d0':'rgba(155,114,208,0.12)',
+  '#e08040':'rgba(224,128,64,0.12)',
+  '#5ab8c4':'rgba(90,184,196,0.12)',
+  '#888':'rgba(136,136,136,0.12)',
+};
+
+let state = {
+  currentDate: new Date(),
+  timelineMode: 'day',
+  events: [],
+  tags: ['Perso','Travail'],
+  selectedColor: COLORS[0],
+  selectedTag: 'Perso',
+  editingEventId: null,
+  tasks: { inu:[], iu:[], ninu:[], niu:[], today:[], tomorrow:[] },
+  notes: '',
+};
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('planner_v1');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state.events = parsed.events || [];
+      state.tags = parsed.tags || ['Perso','Travail'];
+      state.tasks = parsed.tasks || state.tasks;
+      state.notes = parsed.notes || '';
+    }
+  } catch(e) {}
+}
+
+function saveState() {
+  localStorage.setItem('planner_v1', JSON.stringify({
+    events: state.events,
+    tags: state.tags,
+    tasks: state.tasks,
+    notes: state.notes,
+  }));
+}
+
+// =============================================
+// NAVIGATION
+// =============================================
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('nav-' + page).classList.add('active');
+}
+
+function setTimelineMode(mode) {
+  state.timelineMode = mode;
+  document.getElementById('btn-day').classList.toggle('active', mode === 'day');
+  document.getElementById('btn-month').classList.toggle('active', mode === 'month');
+  const page = document.getElementById('page-timeline');
+  if (mode === 'month') {
+    page.classList.add('month-mode');
+    renderMonth();
+  } else {
+    page.classList.remove('month-mode');
+    renderDay();
+  }
+  updateDateLabel();
+}
+
+function navigateDate(dir) {
+  if (state.timelineMode === 'day') {
+    state.currentDate = new Date(state.currentDate);
+    state.currentDate.setDate(state.currentDate.getDate() + dir);
+    renderDay();
+  } else {
+    state.currentDate = new Date(state.currentDate);
+    state.currentDate.setMonth(state.currentDate.getMonth() + dir);
+    renderMonth();
+  }
+  updateDateLabel();
+}
+
+function goToday() {
+  state.currentDate = new Date();
+  if (state.timelineMode === 'day') renderDay();
+  else renderMonth();
+  updateDateLabel();
+}
+
+function updateDateLabel() {
+  const d = state.currentDate;
+  let label = '';
+  if (state.timelineMode === 'day') {
+    label = d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    label = label.charAt(0).toUpperCase() + label.slice(1);
+  } else {
+    label = d.toLocaleDateString('fr-FR', { month:'long', year:'numeric' });
+    label = label.charAt(0).toUpperCase() + label.slice(1);
+  }
+  document.getElementById('date-label').textContent = label;
+}
+
+// =============================================
+// DAY RENDER
+// =============================================
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function renderDay() {
+  const grid = document.getElementById('timeline-grid');
+  grid.innerHTML = '<div class="current-time-line" id="time-line"></div>';
+
+  const dk = dateKey(state.currentDate);
+  const dayEvents = state.events.filter(e => e.startDate === dk);
+
+  // build 24 rows
+  for (let h = 0; h < 24; h++) {
+    const row = document.createElement('div');
+    row.className = 'hour-row';
+    row.dataset.hour = h;
+
+    const label = document.createElement('div');
+    label.className = 'hour-label';
+    label.textContent = String(h).padStart(2,'0') + ':00';
+
+    const cells = document.createElement('div');
+    cells.className = 'hour-cells';
+
+    const quarters = document.createElement('div');
+    quarters.className = 'quarter-lines';
+    for (let q = 0; q < 4; q++) {
+      const ql = document.createElement('div');
+      ql.className = 'quarter-line';
+      quarters.appendChild(ql);
+    }
+
+    const lane = document.createElement('div');
+    lane.className = 'events-lane';
+
+    // events in this hour
+    const hEvents = dayEvents.filter(e => {
+      const sh = parseInt(e.startTime.split(':')[0]);
+      const eh = parseInt(e.endTime.split(':')[0]);
+      return sh <= h && eh >= h;
+    });
+
+    hEvents.forEach(ev => {
+      // only render the bar in the starting hour to avoid duplication
+      if (parseInt(ev.startTime.split(':')[0]) === h) {
+        lane.appendChild(buildEventBar(ev));
+      }
+    });
+
+    cells.appendChild(quarters);
+    cells.appendChild(lane);
+    row.appendChild(label);
+    row.appendChild(cells);
+    grid.appendChild(row);
+  }
+
+  setupDragSelect();
+  updateTimeLine();
+}
+
+function buildEventBar(ev) {
+  const bar = document.createElement('div');
+  bar.className = 'event-bar';
+  bar.style.backgroundColor = COLOR_LIGHT[ev.color] || 'rgba(74,144,217,0.12)';
+  bar.style.color = ev.color;
+  bar.style.borderLeftColor = ev.color;
+
+  const timeSpan = document.createElement('span');
+  timeSpan.className = 'event-time';
+  timeSpan.textContent = ev.startTime + ' - ' + ev.endTime;
+
+  const nameSpan = document.createElement('span');
+  nameSpan.className = 'event-name';
+  nameSpan.textContent = ev.name;
+
+  const tagSpan = document.createElement('span');
+  tagSpan.className = 'event-tag';
+  tagSpan.textContent = ev.tag || '';
+
+  const delBtn = document.createElement('button');
+  delBtn.className = 'event-delete';
+  delBtn.title = 'Supprimer';
+  delBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+  delBtn.onclick = (e) => { e.stopPropagation(); deleteEvent(ev.id); };
+
+  bar.appendChild(timeSpan);
+  bar.appendChild(nameSpan);
+  if (ev.tag) bar.appendChild(tagSpan);
+  bar.appendChild(delBtn);
+
+  bar.addEventListener('click', () => openModal(ev));
+  return bar;
+}
+
+function deleteEvent(id) {
+  state.events = state.events.filter(e => e.id !== id);
+  saveState();
+  renderDay();
+}
+
+// =============================================
+// DRAG SELECT ON TIMELINE
+// =============================================
+let dragStart = null;
+let dragStartY = 0;
+
+function setupDragSelect() {
+  const scroll = document.getElementById('timeline-scroll');
+  const grid = document.getElementById('timeline-grid');
+
+  grid.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.event-bar')) return;
+    const row = e.target.closest('.hour-row');
+    if (!row) return;
+    e.preventDefault();
+
+    const h = parseInt(row.dataset.hour);
+    const rect = row.getBoundingClientRect();
+    const relY = e.clientY - rect.top;
+    const q = Math.floor(relY / (rect.height / 4));
+    const mins = q * 15;
+
+    dragStart = { h, mins };
+    dragStartY = e.clientY;
+  });
+
+  document.addEventListener('mouseup', (e) => {
+    if (!dragStart) return;
+
+    const row = e.target.closest?.('.hour-row');
+    let endH = dragStart.h;
+    let endMins = dragStart.mins + 60;
+
+    if (row) {
+      endH = parseInt(row.dataset.hour);
+      const rect = row.getBoundingClientRect();
+      const relY = e.clientY - rect.top;
+      const q = Math.floor(relY / (rect.height / 4));
+      endMins = q * 15;
+    }
+
+    const startTotalMins = dragStart.h * 60 + dragStart.mins;
+    const endTotalMins = endH * 60 + endMins;
+
+    const finalStart = Math.min(startTotalMins, endTotalMins);
+    const finalEnd = Math.max(startTotalMins, endTotalMins) + 15;
+
+    const sh = Math.floor(finalStart / 60);
+    const sm = finalStart % 60;
+    const eh = Math.floor(Math.min(finalEnd, 24*60 - 1) / 60);
+    const em = Math.min(finalEnd, 24*60 - 1) % 60;
+
+    const startTime = String(sh).padStart(2,'0') + ':' + String(sm).padStart(2,'0');
+    const endTime = String(eh).padStart(2,'0') + ':' + String(em).padStart(2,'0');
+
+    dragStart = null;
+    openModal(null, startTime, endTime);
+  });
+}
+
+// =============================================
+// TIME LINE INDICATOR
+// =============================================
+function updateTimeLine() {
+  const line = document.getElementById('time-line');
+  if (!line) return;
+  const now = new Date();
+  const dk = dateKey(state.currentDate);
+  const todayDk = dateKey(now);
+
+  if (dk !== todayDk) { line.style.display = 'none'; return; }
+  line.style.display = 'block';
+
+  const totalMins = now.getHours() * 60 + now.getMinutes();
+  const rowH = 56;
+  const top = totalMins * (rowH / 60);
+  line.style.top = top + 'px';
+}
+
+setInterval(updateTimeLine, 60000);
+
+// =============================================
+// MONTH RENDER
+// =============================================
+function renderMonth() {
+  const container = document.getElementById('month-days');
+  container.innerHTML = '';
+
+  const d = state.currentDate;
+  const year = d.getFullYear();
+  const month = d.getMonth();
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+
+  let startDow = firstDay.getDay();
+  startDow = startDow === 0 ? 6 : startDow - 1; // Mon=0
+
+  const today = new Date();
+  const todayKey = dateKey(today);
+
+  for (let i = 0; i < 42; i++) {
+    const offset = i - startDow;
+    const cellDate = new Date(year, month, 1 + offset);
+    const cellKey = dateKey(cellDate);
+    const isCurrentMonth = cellDate.getMonth() === month;
+    const isToday = cellKey === todayKey;
+    const isSelected = cellKey === dateKey(state.currentDate);
+
+    const cell = document.createElement('div');
+    cell.className = 'month-day';
+    if (!isCurrentMonth) cell.classList.add('other-month');
+    if (isToday) cell.classList.add('today');
+    if (isSelected && state.timelineMode === 'day') cell.classList.add('selected');
+
+    const numDiv = document.createElement('div');
+    numDiv.className = 'day-num';
+    numDiv.textContent = cellDate.getDate();
+
+    cell.appendChild(numDiv);
+
+    const dayEvs = state.events.filter(e => e.startDate === cellKey).slice(0, 3);
+    if (dayEvs.length) {
+      const preview = document.createElement('div');
+      preview.className = 'month-events-preview';
+      dayEvs.forEach(ev => {
+        const pill = document.createElement('div');
+        pill.className = 'month-event-pill';
+        pill.style.background = COLOR_LIGHT[ev.color] || 'rgba(74,144,217,0.12)';
+        pill.style.color = ev.color;
+        pill.textContent = ev.name;
+        preview.appendChild(pill);
+      });
+      cell.appendChild(preview);
+    }
+
+    cell.addEventListener('click', () => {
+      state.currentDate = new Date(cellDate);
+      setTimelineMode('day');
+    });
+
+    container.appendChild(cell);
+  }
+}
+
+// =============================================
+// MODAL
+// =============================================
+function buildColorRow() {
+  const row = document.getElementById('color-row');
+  row.innerHTML = '';
+  COLORS.forEach(c => {
+    const sw = document.createElement('div');
+    sw.className = 'color-swatch' + (c === state.selectedColor ? ' selected' : '');
+    sw.style.background = c;
+    sw.onclick = () => {
+      state.selectedColor = c;
+      row.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+      sw.classList.add('selected');
+    };
+    row.appendChild(sw);
+  });
+}
+
+function buildTagRow() {
+  const row = document.getElementById('tag-row');
+  const addBtn = row.querySelector('.add-tag-chip');
+  const inlineInput = document.getElementById('tag-input-inline');
+
+  // remove dynamic chips
+  row.querySelectorAll('[data-tag]').forEach(c => c.remove());
+
+  state.tags.forEach(t => {
+    const chip = document.createElement('button');
+    chip.className = 'tag-chip' + (t === state.selectedTag ? ' selected' : '');
+    chip.dataset.tag = t;
+    chip.textContent = t;
+    chip.onclick = () => selectTag(chip);
+    row.insertBefore(chip, addBtn);
+  });
+}
+
+function selectTag(chip) {
+  state.selectedTag = chip.dataset.tag;
+  document.querySelectorAll('.tag-chip[data-tag]').forEach(c => c.classList.remove('selected'));
+  chip.classList.add('selected');
+}
+
+function showTagInput() {
+  document.getElementById('tag-input-inline').classList.add('visible');
+  document.getElementById('tag-input-inline').focus();
+}
+
+function confirmTag(e) {
+  if (e.key === 'Enter') {
+    const val = e.target.value.trim();
+    if (val && !state.tags.includes(val)) {
+      state.tags.push(val);
+      state.selectedTag = val;
+      buildTagRow();
+    }
+    e.target.value = '';
+    e.target.classList.remove('visible');
+  }
+  if (e.key === 'Escape') {
+    e.target.value = '';
+    e.target.classList.remove('visible');
+  }
+}
+
+function openModal(ev = null, startTime = null, endTime = null) {
+  state.editingEventId = ev ? ev.id : null;
+  document.getElementById('modal-title').textContent = ev ? 'Modifier l\'événement' : 'Nouvel événement';
+
+  const dk = dateKey(state.currentDate);
+  const startVal = ev
+    ? ev.startDate + 'T' + ev.startTime
+    : dk + 'T' + (startTime || '09:00');
+  const endVal = ev
+    ? ev.endDate + 'T' + ev.endTime
+    : dk + 'T' + (endTime || '10:00');
+
+  document.getElementById('ev-name').value = ev ? ev.name : '';
+  document.getElementById('ev-desc').value = ev ? (ev.desc || '') : '';
+  document.getElementById('ev-start').value = startVal;
+  document.getElementById('ev-end').value = endVal;
+  document.getElementById('ev-location').value = ev ? (ev.location || '') : '';
+
+  state.selectedColor = ev ? ev.color : COLORS[0];
+  state.selectedTag = ev ? (ev.tag || 'Perso') : 'Perso';
+
+  buildColorRow();
+  buildTagRow();
+
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(() => document.getElementById('ev-name').focus(), 80);
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  state.editingEventId = null;
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('overlay')) closeModal();
+}
+
+function saveEvent() {
+  const name = document.getElementById('ev-name').value.trim();
+  if (!name) { document.getElementById('ev-name').focus(); return; }
+
+  const startDT = document.getElementById('ev-start').value;
+  const endDT = document.getElementById('ev-end').value;
+  if (!startDT || !endDT) return;
+
+  const [startDate, startTime] = startDT.split('T');
+  const [endDate, endTime] = endDT.split('T');
+
+  const ev = {
+    id: state.editingEventId || Date.now().toString(),
+    name,
+    desc: document.getElementById('ev-desc').value,
+    startDate, startTime: startTime.slice(0,5),
+    endDate, endTime: endTime.slice(0,5),
+    location: document.getElementById('ev-location').value,
+    color: state.selectedColor,
+    tag: state.selectedTag,
+  };
+
+  if (state.editingEventId) {
+    state.events = state.events.map(e => e.id === state.editingEventId ? ev : e);
+  } else {
+    state.events.push(ev);
+  }
+
+  saveState();
+  closeModal();
+  renderDay();
+}
+
+// =============================================
+// MATRIX
+// =============================================
+function addTask(listId, focus = true) {
+  const container = document.getElementById('list-' + listId);
+  const row = document.createElement('div');
+  row.className = 'q-item';
+
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.className = 'checkbox';
+
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.className = 'q-input';
+  inp.placeholder = 'Tâche...';
+
+  cb.addEventListener('change', () => {
+    inp.classList.toggle('done', cb.checked);
+    saveMatrix();
+  });
+
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') addTask(listId);
+    if (e.key === 'Backspace' && inp.value === '') { row.remove(); saveMatrix(); }
+  });
+
+  inp.addEventListener('input', saveMatrix);
+
+  row.appendChild(cb);
+  row.appendChild(inp);
+  container.appendChild(row);
+  if (focus) inp.focus();
+}
+
+function saveMatrix() {
+  const lists = ['inu','iu','ninu','niu','today','tomorrow'];
+  const tasks = {};
+  lists.forEach(id => {
+    const items = document.querySelectorAll('#list-' + id + ' .q-item');
+    tasks[id] = Array.from(items).map(row => ({
+      text: row.querySelector('.q-input').value,
+      done: row.querySelector('.checkbox').checked,
+    }));
+  });
+  state.tasks = tasks;
+  state.notes = document.getElementById('matrix-notes').value;
+  saveState();
+}
+
+function loadMatrix() {
+  const lists = ['inu','iu','ninu','niu','today','tomorrow'];
+  lists.forEach(id => {
+    const tasks = state.tasks[id] || [];
+    if (tasks.length > 0) {
+      tasks.forEach(t => {
+        addTask(id, false);
+        const rows = document.querySelectorAll('#list-' + id + ' .q-item');
+        const last = rows[rows.length - 1];
+        if (last) {
+          last.querySelector('.q-input').value = t.text;
+          if (t.done) {
+            last.querySelector('.checkbox').checked = true;
+            last.querySelector('.q-input').classList.add('done');
+          }
+        }
+      });
+    } else {
+      const defaults = id.includes('today') ? 6 : id === 'tomorrow' ? 4 : 4;
+      for (let i = 0; i < defaults; i++) addTask(id, false);
+    }
+  });
+
+  document.getElementById('matrix-notes').value = state.notes || '';
+  document.getElementById('matrix-notes').addEventListener('input', saveMatrix);
+}
+
+// =============================================
+// INIT
+// =============================================
+function init() {
+  loadState();
+  updateDateLabel();
+  renderDay();
+  loadMatrix();
+
+  const now = new Date();
+  document.getElementById('matrix-date').textContent =
+    now.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+}
+
+init();
+</script>
+</body>
+</html>
