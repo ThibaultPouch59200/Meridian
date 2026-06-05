@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-black text-white text-xs font-medium rounded tracking-wide transition-opacity hover:opacity-80;
+  }
+
+  .section-label {
+    @apply text-[9px] font-semibold tracking-[2px] uppercase text-gray-400;
+  }
+
+  .event-bar {
+    @apply flex items-center gap-2 px-3 py-1.5 rounded-sm border-l-[3px] cursor-pointer transition-all hover:translate-x-px;
+  }
+
+  .form-input {
+    @apply w-full font-sans text-[13px] border border-gray-200 rounded-[3px] px-[10px] py-[7px] outline-none text-black bg-white transition-colors duration-150 focus:border-black;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #dddddd;
+    border-radius: 2px;
+  }
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(6px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
