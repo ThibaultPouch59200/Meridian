@@ -18,7 +18,7 @@ La maquette de référence visuelle se trouve dans `docs/maquette.html`.
 
 | Couche | Technologie |
 |---|---|
-| Framework | Nuxt 3 (SSR désactivé, mode SPA) |
+| Framework | Nuxt 4 (SSR désactivé, mode SPA) |
 | CSS | Tailwind CSS v3 + fichier `assets/css/main.css` pour les classes partagées |
 | State | Pinia |
 | Routing | Vue Router via Nuxt (pages/) |

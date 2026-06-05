@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-const HOUR_ROW_PX = 56
+import { HOUR_ROW_PX } from '~/utils/timeline'
 
 const props = defineProps<{ currentDate: string }>()
 const { now } = useCurrentTime()

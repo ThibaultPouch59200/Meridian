@@ -99,10 +99,9 @@
 <script setup lang="ts">
 import type { CalendarEvent } from '~~/types'
 import { useEventsStore } from '~/stores/events'
-import { useTagsStore } from '~/stores/tags'
+import { HOUR_ROW_PX } from '~/utils/timeline'
 
 const store = useEventsStore()
-const tagsStore = useTagsStore()
 const scrollRef = ref<HTMLElement>()
 
 const modalOpen = ref(false)
@@ -111,8 +110,6 @@ const newEventStart = ref('09:00')
 const newEventEnd = ref('10:00')
 
 onMounted(() => {
-  store.load()
-  tagsStore.load()
   scrollToCurrentHour()
 })
 
@@ -169,7 +166,6 @@ function selectDateFromMonth(date: string) {
 function scrollToCurrentHour() {
   const todayKey = dateKey(new Date())
   if (store.currentDate !== todayKey || !scrollRef.value) return
-  const HOUR_ROW_PX = 56
   scrollRef.value.scrollTop = Math.max(0, (new Date().getHours() - 1) * HOUR_ROW_PX)
 }
 

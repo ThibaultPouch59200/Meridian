@@ -210,15 +210,20 @@ function confirmNewTag() {
 
 function submit() {
   if (!form.name.trim() || !form.start || !form.end) return
-  const startParts = form.start.split('T') as [string, string]
-  const endParts = form.end.split('T') as [string, string]
+  if (form.end <= form.start) return
+  const startParts = form.start.split('T')
+  const startDate = startParts[0] ?? ''
+  const endParts = form.end.split('T')
+  const endDate = endParts[0] ?? ''
+  const startTimeFull = startParts[1] ?? '00:00'
+  const endTimeFull = endParts[1] ?? '00:00'
   emit('save', {
     name: form.name.trim(),
     desc: form.desc || undefined,
-    startDate: startParts[0],
-    startTime: startParts[1].slice(0, 5),
-    endDate: endParts[0],
-    endTime: endParts[1].slice(0, 5),
+    startDate,
+    startTime: startTimeFull.slice(0, 5),
+    endDate,
+    endTime: endTimeFull.slice(0, 5),
     location: form.location || undefined,
     color: form.color,
     tag: form.tag,
