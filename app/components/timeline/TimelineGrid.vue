@@ -14,8 +14,8 @@
       <div
         v-for="event in dayEvents"
         :key="event.id"
-        class="absolute left-2 right-4 pointer-events-auto"
-        :style="{ top: `${eventTop(event)}px`, height: `${eventHeight(event)}px` }"
+        class="absolute pointer-events-auto"
+        :style="eventStyle(event)"
       >
         <EventBar
           :event="event"
@@ -55,13 +55,45 @@ const isDragging = ref(false)
 const dragStartMin = ref(0)
 const dragCurrentMin = ref(0)
 
-function eventTop(event: CalendarEvent): number {
-  return minutesToPx(timeToMinutes(event.startTime))
-}
+const eventLayouts = computed(() => {
+  const sorted = [...props.dayEvents].sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime))
+  const assignments = new Map<string, number>()
+  const colEnds: number[] = []
 
-function eventHeight(event: CalendarEvent): number {
-  const duration = timeToMinutes(event.endTime) - timeToMinutes(event.startTime)
-  return Math.max(minutesToPx(duration), 20)
+  for (const event of sorted) {
+    const start = timeToMinutes(event.startTime)
+    const end = timeToMinutes(event.endTime)
+    let col = colEnds.findIndex(colEnd => colEnd <= start)
+    if (col === -1) { col = colEnds.length; colEnds.push(end) }
+    else { colEnds[col] = end }
+    assignments.set(event.id, col)
+  }
+
+  const result = new Map<string, { col: number; totalCols: number }>()
+  for (const event of props.dayEvents) {
+    const eStart = timeToMinutes(event.startTime)
+    const eEnd = timeToMinutes(event.endTime)
+    let maxCol = 0
+    for (const other of props.dayEvents) {
+      if (timeToMinutes(other.startTime) < eEnd && timeToMinutes(other.endTime) > eStart)
+        maxCol = Math.max(maxCol, assignments.get(other.id) ?? 0)
+    }
+    result.set(event.id, { col: assignments.get(event.id) ?? 0, totalCols: maxCol + 1 })
+  }
+  return result
+})
+
+function eventStyle(event: CalendarEvent) {
+  const { col, totalCols } = eventLayouts.value.get(event.id) ?? { col: 0, totalCols: 1 }
+  const top = minutesToPx(timeToMinutes(event.startTime))
+  const height = Math.max(minutesToPx(timeToMinutes(event.endTime) - timeToMinutes(event.startTime)), 20)
+  const gap = 3
+  return {
+    top: `${top}px`,
+    height: `${height}px`,
+    left: `calc(${(col / totalCols) * 100}% + ${gap}px)`,
+    width: `calc(${(1 / totalCols) * 100}% - ${gap * 2}px)`,
+  }
 }
 
 function getMinutesFromY(clientY: number): number {
