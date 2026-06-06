@@ -1,6 +1,6 @@
 <template>
   <div
-    class="event-bar group hover:opacity-[.85]"
+    class="event-bar group hover:opacity-[.85] h-full overflow-hidden items-start"
     :style="{
       backgroundColor: colorBg,
       color: event.color,

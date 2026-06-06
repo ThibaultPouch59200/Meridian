@@ -72,6 +72,7 @@
         :day-events="store.dayEvents"
         @event-click="openEditEvent"
         @event-delete="(id) => store.deleteEvent(id)"
+        @create="openNewEventAtTime"
       />
     </div>
 
@@ -173,6 +174,13 @@ function openNewEvent() {
   editingEvent.value = null
   newEventStart.value = '09:00'
   newEventEnd.value = '10:00'
+  modalOpen.value = true
+}
+
+function openNewEventAtTime({ startTime, endTime }: { startTime: string; endTime: string }) {
+  editingEvent.value = null
+  newEventStart.value = startTime
+  newEventEnd.value = endTime
   modalOpen.value = true
 }
 
