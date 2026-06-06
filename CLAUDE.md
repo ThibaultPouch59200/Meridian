@@ -18,7 +18,7 @@ La maquette de référence visuelle se trouve dans `docs/maquette.html`.
 
 | Couche | Technologie |
 |---|---|
-| Framework | Nuxt 3 (SSR désactivé, mode SPA) |
+| Framework | Nuxt 4 (SSR désactivé, mode SPA) |
 | CSS | Tailwind CSS v3 + fichier `assets/css/main.css` pour les classes partagées |
 | State | Pinia |
 | Routing | Vue Router via Nuxt (pages/) |
@@ -99,43 +99,47 @@ chore(docker): add nginx reverse proxy to compose file
 
 ## Architecture des fichiers
 
+Le projet utilise **Nuxt 4** avec la structure `app/` (srcDir par défaut). Tous les fichiers Vue, composables, stores et layouts sont dans `app/`. Les fichiers de configuration restent à la racine.
+
 ```
 meridian/
-├── assets/
-│   └── css/
-│       └── main.css          # Classes Tailwind partagées et custom
-├── components/
-│   ├── layout/
-│   │   └── AppSidebar.vue
-│   ├── timeline/
-│   │   ├── TimelineGrid.vue
-│   │   ├── TimelineHourRow.vue
-│   │   ├── EventBar.vue
-│   │   ├── CurrentTimeLine.vue
-│   │   └── MonthCalendar.vue
-│   ├── matrix/
-│   │   ├── MatrixQuadrant.vue
-│   │   ├── MatrixTaskItem.vue
-│   │   └── MatrixNotesArea.vue
-│   └── ui/
-│       ├── EventModal.vue
-│       ├── ColorSwatch.vue
-│       ├── TagChip.vue
-│       └── IconButton.vue
-├── composables/
-│   ├── useEvents.ts
-│   ├── useDragSelect.ts
-│   └── useCurrentTime.ts
-├── stores/
-│   ├── events.ts
-│   ├── matrix.ts
-│   └── tags.ts
-├── pages/
-│   ├── index.vue             # Redirige vers /timeline
-│   ├── timeline.vue
-│   └── matrix.vue
-├── layouts/
-│   └── default.vue           # Layout avec AppSidebar
+├── app/                      # srcDir Nuxt 4 — tout le code Vue ici
+│   ├── assets/
+│   │   └── css/
+│   │       └── main.css      # Classes Tailwind partagées et custom
+│   ├── components/
+│   │   ├── layout/
+│   │   │   └── AppSidebar.vue
+│   │   ├── timeline/
+│   │   │   ├── TimelineGrid.vue
+│   │   │   ├── TimelineHourRow.vue
+│   │   │   ├── EventBar.vue
+│   │   │   ├── CurrentTimeLine.vue
+│   │   │   └── MonthCalendar.vue
+│   │   ├── matrix/
+│   │   │   ├── MatrixQuadrant.vue
+│   │   │   ├── MatrixTaskItem.vue
+│   │   │   └── MatrixNotesArea.vue
+│   │   └── ui/
+│   │       ├── EventModal.vue
+│   │       ├── ColorSwatch.vue
+│   │       ├── TagChip.vue
+│   │       └── IconButton.vue
+│   ├── composables/
+│   │   ├── useEvents.ts
+│   │   ├── useDragSelect.ts
+│   │   └── useCurrentTime.ts
+│   ├── stores/
+│   │   ├── events.ts
+│   │   ├── matrix.ts
+│   │   └── tags.ts
+│   ├── pages/
+│   │   ├── index.vue         # Redirige vers /timeline
+│   │   ├── timeline.vue
+│   │   └── matrix.vue
+│   ├── layouts/
+│   │   └── default.vue       # Layout avec AppSidebar
+│   └── app.vue               # Entrée Nuxt 4
 ├── types/
 │   └── index.ts              # Interfaces Event, Task, Tag...
 ├── docs/
@@ -152,10 +156,10 @@ meridian/
 ## CSS — règles Tailwind
 
 - Les classes Tailwind s'utilisent directement dans les templates `.vue`.
-- **Si une combinaison de classes est utilisée plus d'une fois dans le projet**, elle est extraite dans `assets/css/main.css` avec `@apply` :
+- **Si une combinaison de classes est utilisée plus d'une fois dans le projet**, elle est extraite dans `app/assets/css/main.css` avec `@apply` :
 
 ```css
-/* assets/css/main.css */
+/* app/assets/css/main.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
