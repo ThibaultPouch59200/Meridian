@@ -46,7 +46,20 @@
             <textarea v-model="form.desc" class="form-input resize-none h-[60px] leading-relaxed" placeholder="Optionnel..." />
           </div>
 
-          <div class="flex gap-3 mb-[14px]">
+          <div class="flex items-center gap-2 mb-[14px]">
+            <input
+              id="allDay"
+              v-model="form.allDay"
+              type="checkbox"
+              class="w-[13px] h-[13px] cursor-pointer accent-black"
+              @change="onAllDayChange"
+            />
+            <label for="allDay" class="text-[11px] font-medium text-gray-600 cursor-pointer select-none">
+              Journée entière
+            </label>
+          </div>
+
+          <div v-if="!form.allDay" class="flex gap-3 mb-[14px]">
             <div class="flex flex-col gap-[5px] flex-1">
               <label class="text-[9px] font-semibold tracking-[1.2px] uppercase text-gray-400">Début</label>
               <input v-model="form.start" type="datetime-local" class="form-input" />
@@ -54,6 +67,16 @@
             <div class="flex flex-col gap-[5px] flex-1">
               <label class="text-[9px] font-semibold tracking-[1.2px] uppercase text-gray-400">Fin</label>
               <input v-model="form.end" type="datetime-local" class="form-input" />
+            </div>
+          </div>
+          <div v-else class="flex gap-3 mb-[14px]">
+            <div class="flex flex-col gap-[5px] flex-1">
+              <label class="text-[9px] font-semibold tracking-[1.2px] uppercase text-gray-400">Début</label>
+              <input v-model="form.startDate" type="date" class="form-input" />
+            </div>
+            <div class="flex flex-col gap-[5px] flex-1">
+              <label class="text-[9px] font-semibold tracking-[1.2px] uppercase text-gray-400">Fin</label>
+              <input v-model="form.endDate" type="date" class="form-input" />
             </div>
           </div>
 
@@ -151,8 +174,11 @@ const isEditing = computed(() => !!props.initialEvent)
 const form = reactive({
   name: '',
   desc: '',
+  allDay: false,
   start: '',
   end: '',
+  startDate: '',
+  endDate: '',
   location: '',
   color: EVENT_COLORS[0] ?? '#4a90d9',
   tag: tagsStore.tags[0]?.label ?? 'Perso',
@@ -168,16 +194,22 @@ watch(
     if (props.initialEvent) {
       form.name = props.initialEvent.name
       form.desc = props.initialEvent.desc ?? ''
+      form.allDay = props.initialEvent.allDay ?? false
       form.start = `${props.initialEvent.startDate}T${props.initialEvent.startTime}`
       form.end = `${props.initialEvent.endDate}T${props.initialEvent.endTime}`
+      form.startDate = props.initialEvent.startDate
+      form.endDate = props.initialEvent.endDate
       form.location = props.initialEvent.location ?? ''
       form.color = props.initialEvent.color
       form.tag = props.initialEvent.tag
     } else {
       form.name = ''
       form.desc = ''
+      form.allDay = false
       form.start = `${date}T${props.initialStartTime ?? '09:00'}`
       form.end = `${date}T${props.initialEndTime ?? '10:00'}`
+      form.startDate = date
+      form.endDate = date
       form.location = ''
       form.color = EVENT_COLORS[0] ?? '#4a90d9'
       form.tag = tagsStore.tags[0]?.label ?? 'Perso'
@@ -186,6 +218,16 @@ watch(
     nameRef.value?.focus()
   },
 )
+
+function onAllDayChange() {
+  if (form.allDay) {
+    form.startDate = form.start.slice(0, 10)
+    form.endDate = form.end.slice(0, 10) || form.start.slice(0, 10)
+  } else {
+    form.start = `${form.startDate}T00:00`
+    form.end = `${form.endDate}T23:59`
+  }
+}
 
 watch(addingTag, async (val) => {
   if (val) {
@@ -209,25 +251,41 @@ function confirmNewTag() {
 }
 
 function submit() {
-  if (!form.name.trim() || !form.start || !form.end) return
-  if (form.end <= form.start) return
-  const startParts = form.start.split('T')
-  const startDate = startParts[0] ?? ''
-  const endParts = form.end.split('T')
-  const endDate = endParts[0] ?? ''
-  const startTimeFull = startParts[1] ?? '00:00'
-  const endTimeFull = endParts[1] ?? '00:00'
-  emit('save', {
-    name: form.name.trim(),
-    desc: form.desc || undefined,
-    startDate,
-    startTime: startTimeFull.slice(0, 5),
-    endDate,
-    endTime: endTimeFull.slice(0, 5),
-    location: form.location || undefined,
-    color: form.color,
-    tag: form.tag,
-  })
+  if (!form.name.trim()) return
+  if (form.allDay) {
+    if (!form.startDate) return
+    const endDate = form.endDate || form.startDate
+    if (endDate < form.startDate) return
+    emit('save', {
+      name: form.name.trim(),
+      desc: form.desc || undefined,
+      allDay: true,
+      startDate: form.startDate,
+      startTime: '00:00',
+      endDate,
+      endTime: '23:59',
+      location: form.location || undefined,
+      color: form.color,
+      tag: form.tag,
+    })
+  } else {
+    if (!form.start || !form.end) return
+    if (form.end <= form.start) return
+    const startParts = form.start.split('T')
+    const endParts = form.end.split('T')
+    emit('save', {
+      name: form.name.trim(),
+      desc: form.desc || undefined,
+      allDay: false,
+      startDate: startParts[0] ?? '',
+      startTime: (startParts[1] ?? '00:00').slice(0, 5),
+      endDate: endParts[0] ?? '',
+      endTime: (endParts[1] ?? '00:00').slice(0, 5),
+      location: form.location || undefined,
+      color: form.color,
+      tag: form.tag,
+    })
+  }
   emit('update:open', false)
 }
 </script>

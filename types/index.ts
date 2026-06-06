@@ -2,6 +2,7 @@ export interface CalendarEvent {
   id: string
   name: string
   desc?: string
+  allDay?: boolean
   startDate: string
   startTime: string
   endDate: string

@@ -32,9 +32,21 @@ export const useEventsStore = defineStore('events', {
   }),
   getters: {
     dayEvents: (state): CalendarEvent[] =>
-      state.events.filter(e => e.startDate === state.currentDate),
+      state.events.filter(e =>
+        !e.allDay && e.startDate === state.currentDate && e.endDate === state.currentDate,
+      ),
+    allDayEvents: (state): CalendarEvent[] =>
+      state.events.filter(e =>
+        (e.allDay === true || e.startDate !== e.endDate) &&
+        e.startDate <= state.currentDate &&
+        e.endDate >= state.currentDate,
+      ),
     eventsForDate: (state) => (date: string): CalendarEvent[] =>
-      state.events.filter(e => e.startDate === date),
+      state.events.filter(e =>
+        e.allDay || e.startDate !== e.endDate
+          ? e.startDate <= date && e.endDate >= date
+          : e.startDate === date,
+      ),
   },
   actions: {
     load() {

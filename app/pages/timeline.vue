@@ -61,6 +61,38 @@
       </button>
     </header>
 
+    <!-- All-day / multi-day band (day view only) -->
+    <div
+      v-if="store.timelineMode === 'day' && store.allDayEvents.length"
+      class="flex-shrink-0 border-b border-gray-200 px-6 py-2 flex flex-col gap-[3px]"
+    >
+      <div
+        v-for="event in store.allDayEvents"
+        :key="event.id"
+        class="flex items-center gap-2 px-3 py-[5px] rounded-sm border-l-[3px] text-[10px] font-medium cursor-pointer hover:opacity-80 transition-opacity"
+        :style="{ backgroundColor: colorBg(event.color), color: event.color, borderLeftColor: event.color }"
+        @click="openEditEvent(event)"
+      >
+        <span v-if="event.startDate !== event.endDate" class="opacity-60 tabular-nums whitespace-nowrap text-[9px]">
+          {{ formatDateShort(event.startDate) }} → {{ formatDateShort(event.endDate) }}
+        </span>
+        <span class="flex-1 truncate">{{ event.name }}</span>
+        <span
+          v-if="event.tag"
+          class="text-[9px] font-semibold tracking-[0.8px] uppercase opacity-65 px-[6px] py-[2px] rounded-[2px] bg-white/35 flex-shrink-0"
+        >{{ event.tag }}</span>
+        <button
+          class="w-4 h-4 flex items-center justify-center rounded-[2px] bg-white/35 opacity-0 hover:opacity-100 transition-opacity flex-shrink-0 border-none cursor-pointer"
+          style="color: inherit"
+          @click.stop="store.deleteEvent(event.id)"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-[10px] h-[10px]" style="stroke-width:2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
     <!-- Day View -->
     <div
       v-show="store.timelineMode === 'day'"
@@ -99,8 +131,17 @@
 
 <script setup lang="ts">
 import type { CalendarEvent } from '~~/types'
-import { useEventsStore } from '~/stores/events'
+import { useEventsStore, EVENT_COLOR_BG } from '~/stores/events'
 import { HOUR_ROW_PX } from '~/utils/timeline'
+
+function colorBg(color: string): string {
+  return EVENT_COLOR_BG[color] ?? 'rgba(74,144,217,0.12)'
+}
+
+function formatDateShort(dateStr: string): string {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  return new Date(y!, (m ?? 1) - 1, d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+}
 
 const store = useEventsStore()
 const scrollRef = ref<HTMLElement>()
