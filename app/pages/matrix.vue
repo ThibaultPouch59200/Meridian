@@ -5,16 +5,15 @@
       <span class="text-xs text-gray-400">{{ dateLabel }}</span>
     </header>
 
-    <div
-      class="flex-1 grid overflow-hidden px-6 relative min-h-0"
-      style="grid-template-columns: 1fr 1fr 190px; grid-template-rows: 1fr 1fr;"
-    >
-      <div
-        class="absolute left-[2px] top-1/2 -translate-y-1/2 -rotate-90 text-[8px] tracking-[2px] uppercase text-gray-400 font-semibold whitespace-nowrap pointer-events-none select-none"
-      >
-        IMPORTANCE
+    <div class="flex-1 flex overflow-hidden min-h-0">
+      <div class="w-5 flex items-center justify-center flex-shrink-0">
+        <span class="-rotate-90 text-[8px] tracking-[2px] uppercase text-gray-400 font-semibold whitespace-nowrap pointer-events-none select-none">IMPORTANCE</span>
       </div>
 
+      <div
+        class="flex-1 grid overflow-hidden px-6 min-h-0"
+        style="grid-template-columns: 1fr 1fr 190px; grid-template-rows: 1fr 1fr;"
+      >
       <MatrixQuadrant title="Important, Not Urgent" subtitle="Décider quand faire" border-class="border-r-0 border-b-0" />
       <MatrixQuadrant title="Important & Urgent" subtitle="Faire immédiatement" border-class="border-b-0" />
 
@@ -29,6 +28,7 @@
 
       <MatrixQuadrant title="Not Important & Not Urgent" subtitle="Faire plus tard" border-class="border-r-0" />
       <MatrixQuadrant title="Not Important & Urgent" subtitle="Déléguer" />
+      </div>
     </div>
 
     <div class="flex items-center justify-center gap-2 text-[8px] tracking-[2px] uppercase text-gray-300 font-semibold py-1 border-t border-gray-200 flex-shrink-0">
