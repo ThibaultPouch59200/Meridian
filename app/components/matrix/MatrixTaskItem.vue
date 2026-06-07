@@ -67,8 +67,8 @@ function commit() {
     store.deleteTask(props.quadrantId, props.task.id)
   } else {
     store.updateTask(props.quadrantId, props.task.id, { text })
-    editing.value = false
   }
+  editing.value = false
 }
 
 function commitAndAddNext() {
