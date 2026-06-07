@@ -29,6 +29,26 @@
     background: #dddddd;
     border-radius: 2px;
   }
+
+  .matrix-checkbox {
+    @apply w-[13px] h-[13px] rounded-full border-[1.5px] border-gray-200 appearance-none cursor-pointer flex-shrink-0 relative;
+  }
+  .matrix-checkbox:checked {
+    background: #0d0d0d;
+    border-color: #0d0d0d;
+  }
+  .matrix-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    left: 2.5px;
+    top: 0.5px;
+    width: 4px;
+    height: 7px;
+    border: 1.5px solid white;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg);
+  }
 }
 
 @keyframes modalIn {
