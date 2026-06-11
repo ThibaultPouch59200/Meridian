@@ -8,25 +8,8 @@
           <span class="font-display text-[20px] font-normal tracking-[-0.3px]">Timeline</span>
 
           <!-- Toggle Jour/Mois : visible sur desktop ici, caché sur mobile -->
-          <div class="hidden sm:flex items-center gap-1">
-            <button
-              :class="[
-                'px-[10px] py-[5px] text-[11px] font-medium tracking-[0.5px] border rounded-[4px] transition-all font-sans cursor-pointer',
-                store.timelineMode === 'day'
-                  ? 'bg-black text-white border-black'
-                  : 'bg-transparent text-gray-600 border-gray-200 hover:bg-gray-50 hover:text-black',
-              ]"
-              @click="setMode('day')"
-            >Jour</button>
-            <button
-              :class="[
-                'px-[10px] py-[5px] text-[11px] font-medium tracking-[0.5px] border rounded-[4px] transition-all font-sans cursor-pointer',
-                store.timelineMode === 'month'
-                  ? 'bg-black text-white border-black'
-                  : 'bg-transparent text-gray-600 border-gray-200 hover:bg-gray-50 hover:text-black',
-              ]"
-              @click="setMode('month')"
-            >Mois</button>
+          <div class="hidden sm:block">
+            <TimelineToggle />
           </div>
 
           <!-- Navigation date : visible sur desktop ici, caché sur mobile -->
@@ -67,26 +50,7 @@
 
       <!-- Ligne 2 : toggle + navigation (mobile uniquement) -->
       <div class="sm:hidden flex items-center justify-between px-4 pb-3">
-        <div class="flex items-center gap-1">
-          <button
-            :class="[
-              'px-[10px] py-[5px] text-[11px] font-medium tracking-[0.5px] border rounded-[4px] transition-all font-sans cursor-pointer',
-              store.timelineMode === 'day'
-                ? 'bg-black text-white border-black'
-                : 'bg-transparent text-gray-600 border-gray-200 hover:bg-gray-50 hover:text-black',
-            ]"
-            @click="setMode('day')"
-          >Jour</button>
-          <button
-            :class="[
-              'px-[10px] py-[5px] text-[11px] font-medium tracking-[0.5px] border rounded-[4px] transition-all font-sans cursor-pointer',
-              store.timelineMode === 'month'
-                ? 'bg-black text-white border-black'
-                : 'bg-transparent text-gray-600 border-gray-200 hover:bg-gray-50 hover:text-black',
-            ]"
-            @click="setMode('month')"
-          >Mois</button>
-        </div>
+        <TimelineToggle />
         <div class="flex items-center gap-[10px]">
           <button
             class="w-7 h-7 border border-gray-200 rounded-[4px] flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:text-black transition-all bg-transparent cursor-pointer"
@@ -96,7 +60,7 @@
               <polyline points="15 18 9 12 15 6"/>
             </svg>
           </button>
-          <span class="text-[13px] font-medium text-center">{{ dateLabel }}</span>
+          <span class="text-[13px] font-medium min-w-[120px] text-center">{{ dateLabel }}</span>
           <button
             class="w-7 h-7 border border-gray-200 rounded-[4px] flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:text-black transition-all bg-transparent cursor-pointer"
             @click="navigate(1)"
@@ -243,9 +207,6 @@ function goToday() {
   if (store.timelineMode === 'day') nextTick(() => scrollToCurrentHour())
 }
 
-function setMode(mode: 'day' | 'month') {
-  store.setTimelineMode(mode)
-}
 
 function selectDateFromMonth(date: string) {
   store.setCurrentDate(date)
