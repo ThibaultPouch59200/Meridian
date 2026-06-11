@@ -1,10 +1,72 @@
 <template>
   <div class="flex flex-col h-screen overflow-hidden">
     <!-- Header -->
-    <header class="flex items-center justify-between px-7 py-[14px] pl-6 border-b border-gray-200 flex-shrink-0">
-      <div class="flex items-center gap-4">
-        <span class="font-display text-[20px] font-normal tracking-[-0.3px]">Timeline</span>
+    <header class="border-b border-gray-200 flex-shrink-0">
+      <!-- Ligne 1 : titre + bouton Ajouter -->
+      <div class="flex items-center justify-between px-4 sm:px-7 sm:pl-6 pt-[14px] pb-2 sm:pb-[14px]">
+        <div class="flex items-center gap-4">
+          <span class="font-display text-[20px] font-normal tracking-[-0.3px]">Timeline</span>
 
+          <!-- Toggle Jour/Mois : visible sur desktop ici, caché sur mobile -->
+          <div class="hidden sm:flex items-center gap-1">
+            <button
+              :class="[
+                'px-[10px] py-[5px] text-[11px] font-medium tracking-[0.5px] border rounded-[4px] transition-all font-sans cursor-pointer',
+                store.timelineMode === 'day'
+                  ? 'bg-black text-white border-black'
+                  : 'bg-transparent text-gray-600 border-gray-200 hover:bg-gray-50 hover:text-black',
+              ]"
+              @click="setMode('day')"
+            >Jour</button>
+            <button
+              :class="[
+                'px-[10px] py-[5px] text-[11px] font-medium tracking-[0.5px] border rounded-[4px] transition-all font-sans cursor-pointer',
+                store.timelineMode === 'month'
+                  ? 'bg-black text-white border-black'
+                  : 'bg-transparent text-gray-600 border-gray-200 hover:bg-gray-50 hover:text-black',
+              ]"
+              @click="setMode('month')"
+            >Mois</button>
+          </div>
+
+          <!-- Navigation date : visible sur desktop ici, caché sur mobile -->
+          <div class="hidden sm:flex items-center gap-[10px]">
+            <button
+              class="w-7 h-7 border border-gray-200 rounded-[4px] flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:text-black transition-all bg-transparent cursor-pointer"
+              @click="navigate(-1)"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-3.5 h-3.5" style="stroke-width:1.8">
+                <polyline points="15 18 9 12 15 6"/>
+              </svg>
+            </button>
+            <span class="text-[13px] font-medium min-w-[160px] text-center">{{ dateLabel }}</span>
+            <button
+              class="w-7 h-7 border border-gray-200 rounded-[4px] flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:text-black transition-all bg-transparent cursor-pointer"
+              @click="navigate(1)"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-3.5 h-3.5" style="stroke-width:1.8">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </button>
+            <button
+              class="px-3 py-[5px] text-[11px] font-medium border border-gray-200 rounded-[4px] tracking-[0.3px] text-gray-600 hover:bg-gray-50 hover:text-black transition-all bg-transparent cursor-pointer font-sans"
+              @click="goToday"
+            >
+              Aujourd'hui
+            </button>
+          </div>
+        </div>
+
+        <button class="btn-primary flex items-center gap-[6px]" @click="openNewEvent">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-[13px] h-[13px]" style="stroke-width:2">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Ajouter
+        </button>
+      </div>
+
+      <!-- Ligne 2 : toggle + navigation (mobile uniquement) -->
+      <div class="sm:hidden flex items-center justify-between px-4 pb-3">
         <div class="flex items-center gap-1">
           <button
             :class="[
@@ -25,7 +87,6 @@
             @click="setMode('month')"
           >Mois</button>
         </div>
-
         <div class="flex items-center gap-[10px]">
           <button
             class="w-7 h-7 border border-gray-200 rounded-[4px] flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:text-black transition-all bg-transparent cursor-pointer"
@@ -35,7 +96,7 @@
               <polyline points="15 18 9 12 15 6"/>
             </svg>
           </button>
-          <span class="text-[13px] font-medium min-w-[160px] text-center">{{ dateLabel }}</span>
+          <span class="text-[13px] font-medium text-center">{{ dateLabel }}</span>
           <button
             class="w-7 h-7 border border-gray-200 rounded-[4px] flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:text-black transition-all bg-transparent cursor-pointer"
             @click="navigate(1)"
@@ -44,21 +105,8 @@
               <polyline points="9 18 15 12 9 6"/>
             </svg>
           </button>
-          <button
-            class="px-3 py-[5px] text-[11px] font-medium border border-gray-200 rounded-[4px] tracking-[0.3px] text-gray-600 hover:bg-gray-50 hover:text-black transition-all bg-transparent cursor-pointer font-sans"
-            @click="goToday"
-          >
-            Aujourd'hui
-          </button>
         </div>
       </div>
-
-      <button class="btn-primary flex items-center gap-[6px]" @click="openNewEvent">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-[13px] h-[13px]" style="stroke-width:2">
-          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-        Ajouter
-      </button>
     </header>
 
     <!-- All-day / multi-day band (day view only) -->
