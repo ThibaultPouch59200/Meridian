@@ -10,11 +10,11 @@
     >
       <div
         v-if="open"
-        class="fixed inset-0 bg-black/[.18] z-[200] flex items-center justify-center"
+        class="fixed inset-0 bg-black/[.18] z-[200] flex items-end sm:items-center sm:justify-center"
         @click.self="$emit('update:open', false)"
       >
         <div
-          class="bg-white border border-gray-200 rounded-md w-[440px] px-7 pt-7 pb-6 relative shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
+          class="bg-white sm:border sm:border-gray-200 sm:rounded-md sm:w-[440px] w-full rounded-t-2xl px-7 pt-7 pb-6 relative shadow-[0_8px_32px_rgba(0,0,0,0.1)] max-h-[90vh] overflow-y-auto sm:max-h-none sm:overflow-visible"
           style="animation: modalIn 0.15s ease"
         >
           <button
