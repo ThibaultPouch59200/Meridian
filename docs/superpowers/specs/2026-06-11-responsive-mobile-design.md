@@ -24,13 +24,14 @@ Meridian est actuellement une SPA desktop-only. Le layout suppose une largeur d'
 ```ts
 export function useBreakpoint() {
   const isMobile = ref(false)
+  const update = () => { isMobile.value = window.innerWidth < 640 }
 
   onMounted(() => {
-    const update = () => { isMobile.value = window.innerWidth < 640 }
     update()
     window.addEventListener('resize', update)
-    onUnmounted(() => window.removeEventListener('resize', update))
   })
+
+  onUnmounted(() => window.removeEventListener('resize', update))
 
   return { isMobile: readonly(isMobile) }
 }
