@@ -1,6 +1,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   runtimeConfig: {
+    databaseUrl: '',
     public: {
       appPassword: '',
     },
@@ -12,6 +13,11 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
   ],
+  nitro: {
+    externals: {
+      external: ['better-sqlite3'],
+    },
+  },
   tailwindcss: {
     cssPath: '~/assets/css/main.css',
     configPath: '~/tailwind.config.ts',
