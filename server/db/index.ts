@@ -25,7 +25,10 @@ export function useDb() {
       location TEXT,
       color TEXT NOT NULL,
       tag TEXT NOT NULL,
-      allDay INTEGER NOT NULL DEFAULT 0
+      allDay INTEGER NOT NULL DEFAULT 0,
+      source TEXT NOT NULL DEFAULT 'meridian',
+      googleEventId TEXT,
+      googleCalendarId TEXT
     );
 
     CREATE TABLE IF NOT EXISTS tasks (
@@ -41,8 +44,31 @@ export function useDb() {
       content TEXT NOT NULL DEFAULT ''
     );
 
+    CREATE TABLE IF NOT EXISTS google_accounts (
+      id TEXT PRIMARY KEY NOT NULL,
+      googleEmail TEXT NOT NULL,
+      accessToken TEXT NOT NULL,
+      refreshToken TEXT NOT NULL,
+      tokenExpiry INTEGER NOT NULL,
+      meridianCalendarId TEXT,
+      createdAt INTEGER NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS google_calendars (
+      id TEXT PRIMARY KEY NOT NULL,
+      googleAccountId TEXT NOT NULL,
+      name TEXT NOT NULL,
+      color TEXT NOT NULL,
+      selected INTEGER NOT NULL DEFAULT 0
+    );
+
     INSERT OR IGNORE INTO matrix_notes (id, content) VALUES (1, '');
   `)
+
+  // Migrate existing events table if columns are missing
+  try { sqlite.exec(`ALTER TABLE events ADD COLUMN source TEXT NOT NULL DEFAULT 'meridian'`) } catch {}
+  try { sqlite.exec(`ALTER TABLE events ADD COLUMN googleEventId TEXT`) } catch {}
+  try { sqlite.exec(`ALTER TABLE events ADD COLUMN googleCalendarId TEXT`) } catch {}
 
   _db = drizzle(sqlite, { schema })
   return _db

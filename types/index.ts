@@ -10,6 +10,9 @@ export interface CalendarEvent {
   location?: string
   color: string
   tag: string
+  source: 'meridian' | 'google'
+  googleEventId?: string
+  googleCalendarId?: string
 }
 
 export interface Task {
