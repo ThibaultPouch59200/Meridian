@@ -19,6 +19,15 @@ export default defineEventHandler(async (event) => {
     tag: body.tag,
     allDay: body.allDay ? 1 : 0,
     source: 'meridian',
+    googleEventId: null,
+    googleCalendarId: null,
   }).run()
-  return { ...body, id, allDay: body.allDay || undefined }
+  return {
+    ...body,
+    id,
+    source: 'meridian' as const,
+    allDay: body.allDay || undefined,
+    googleEventId: undefined,
+    googleCalendarId: undefined,
+  }
 })

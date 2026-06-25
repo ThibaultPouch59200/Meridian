@@ -48,7 +48,8 @@ export const useEventsStore = defineStore('events', {
   },
   actions: {
     async fetch() {
-      this.events = await $fetch<CalendarEvent[]>('/api/events')
+      const rows = await $fetch<CalendarEvent[]>('/api/events')
+      this.events = rows.map(r => ({ ...r, source: r.source ?? 'meridian' }))
     },
     async addEvent(event: Omit<CalendarEvent, 'id'>) {
       const created = await $fetch<CalendarEvent>('/api/events', {
@@ -56,6 +57,16 @@ export const useEventsStore = defineStore('events', {
         body: event,
       })
       this.events.push(created)
+      // Push to Google "Meridian" calendar if a Google account is linked
+      try {
+        const { useGoogleStore } = await import('./google')
+        const googleStore = useGoogleStore()
+        if (googleStore.isConnected) {
+          await $fetch('/api/google/events', { method: 'POST', body: created })
+          // Re-fetch to pick up googleEventId set by the route
+          await this.fetch()
+        }
+      } catch {}
     },
     async updateEvent(updated: CalendarEvent) {
       const result = await $fetch<CalendarEvent>(`/api/events/${updated.id}`, {
@@ -63,11 +74,30 @@ export const useEventsStore = defineStore('events', {
         body: updated,
       })
       const idx = this.events.findIndex(e => e.id === result.id)
-      if (idx !== -1) this.events[idx] = result
+      if (idx !== -1) this.events[idx] = { ...result, source: result.source ?? 'meridian' }
+      // Write-back to Google if the event has a googleEventId
+      if (updated.googleEventId && updated.googleCalendarId) {
+        try {
+          await $fetch(`/api/google/events/${updated.googleEventId}`, {
+            method: 'PATCH',
+            body: updated,
+          })
+        } catch {}
+      }
     },
     async deleteEvent(id: string) {
+      const event = this.events.find(e => e.id === id)
       await $fetch(`/api/events/${id}`, { method: 'DELETE' })
       this.events = this.events.filter(e => e.id !== id)
+      // Delete from Google if the event has a googleEventId
+      if (event?.googleEventId && event.googleCalendarId) {
+        try {
+          await $fetch(
+            `/api/google/events/${event.googleEventId}?calendarId=${encodeURIComponent(event.googleCalendarId)}`,
+            { method: 'DELETE' },
+          )
+        } catch {}
+      }
     },
     setCurrentDate(date: string) {
       this.currentDate = date

@@ -18,6 +18,7 @@ export default defineEventHandler(async (event) => {
     color: body.color,
     tag: body.tag,
     allDay: body.allDay ? 1 : 0,
+    // source, googleEventId, googleCalendarId intentionally NOT updated here
   }).where(eq(events.id, id)).run()
   return { ...body, allDay: body.allDay || undefined }
 })
