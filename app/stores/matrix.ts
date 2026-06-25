@@ -1,8 +1,6 @@
 import { defineStore } from 'pinia'
 import type { Task, QuadrantId } from '~~/types'
 
-const STORAGE_KEY = 'meridian_matrix_v1'
-
 export const useMatrixStore = defineStore('matrix', {
   state: () => ({
     tasks: {
@@ -16,45 +14,57 @@ export const useMatrixStore = defineStore('matrix', {
     notes: '',
   }),
   actions: {
-    load() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY)
-        if (raw) {
-          const parsed = JSON.parse(raw) as { tasks?: Record<QuadrantId, Task[]>; notes?: string }
-          if (parsed.tasks) this.tasks = parsed.tasks
-          if (parsed.notes !== undefined) this.notes = parsed.notes
-        }
-      } catch { /* ignore */ }
+    async fetch() {
+      const [tasksData, notesData] = await Promise.all([
+        $fetch<Record<QuadrantId, Task[]>>('/api/matrix/tasks'),
+        $fetch<{ content: string }>('/api/matrix/notes'),
+      ])
+      this.tasks = tasksData
+      this.notes = notesData.content
     },
-    save() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ tasks: this.tasks, notes: this.notes }))
+    async addTask(quadrant: QuadrantId, text = ''): Promise<string> {
+      const task = await $fetch<Task>('/api/matrix/tasks', {
+        method: 'POST',
+        body: { quadrant, text },
+      })
+      this.tasks[quadrant].push(task)
+      await this.reorderTasks(quadrant)
+      return task.id
     },
-    addTask(quadrant: QuadrantId, text = ''): string {
-      const id = Date.now().toString()
-      this.tasks[quadrant].push({ id, text, done: false })
-      this.save()
-      return id
+    async addTaskAt(quadrant: QuadrantId, afterIndex: number): Promise<string> {
+      const task = await $fetch<Task>('/api/matrix/tasks', {
+        method: 'POST',
+        body: { quadrant, text: '' },
+      })
+      this.tasks[quadrant].splice(afterIndex + 1, 0, task)
+      await this.reorderTasks(quadrant)
+      return task.id
     },
-    addTaskAt(quadrant: QuadrantId, afterIndex: number): string {
-      const id = Date.now().toString()
-      this.tasks[quadrant].splice(afterIndex + 1, 0, { id, text: '', done: false })
-      this.save()
-      return id
-    },
-    updateTask(quadrant: QuadrantId, id: string, patch: Partial<Task>) {
+    async updateTask(quadrant: QuadrantId, id: string, patch: Partial<Task>) {
+      await $fetch(`/api/matrix/tasks/${id}`, {
+        method: 'PUT',
+        body: patch,
+      })
       const task = this.tasks[quadrant].find(t => t.id === id)
-      if (task) {
-        Object.assign(task, patch)
-        this.save()
-      }
+      if (task) Object.assign(task, patch)
     },
-    deleteTask(quadrant: QuadrantId, id: string) {
+    async deleteTask(quadrant: QuadrantId, id: string) {
+      await $fetch(`/api/matrix/tasks/${id}`, { method: 'DELETE' })
       this.tasks[quadrant] = this.tasks[quadrant].filter(t => t.id !== id)
-      this.save()
+      await this.reorderTasks(quadrant)
     },
-    setNotes(value: string) {
+    async reorderTasks(quadrant: QuadrantId) {
+      await $fetch('/api/matrix/tasks/reorder', {
+        method: 'PUT',
+        body: { quadrant, ids: this.tasks[quadrant].map(t => t.id) },
+      })
+    },
+    async setNotes(value: string) {
       this.notes = value
-      this.save()
+      await $fetch('/api/matrix/notes', {
+        method: 'PUT',
+        body: { content: value },
+      })
     },
   },
 })

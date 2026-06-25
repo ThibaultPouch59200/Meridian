@@ -3,6 +3,9 @@ services:
     build: .
     ports:
       - "3006:3000"
+    volumes:
+      - ./data:/app/data
     environment:
       - NODE_ENV=production
+      - NUXT_DATABASE_URL=/app/data/meridian.db
     restart: unless-stopped

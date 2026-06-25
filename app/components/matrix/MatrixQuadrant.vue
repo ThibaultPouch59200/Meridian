@@ -9,7 +9,7 @@
       group="tasks"
       :animation="150"
       class="flex-1 overflow-y-auto scrollbar-thin"
-      @end="store.save()"
+      @end="store.reorderTasks(quadrantId)"
     >
       <MatrixTaskItem
         v-for="(task, index) in store.tasks[quadrantId]"
@@ -51,14 +51,14 @@ function setItemRef(el: unknown, index: number) {
 }
 
 async function addTask() {
-  store.addTask(props.quadrantId)
+  await store.addTask(props.quadrantId)
   await nextTick()
   const last = itemRefs.value[store.tasks[props.quadrantId].length - 1]
   last?.focus()
 }
 
 async function addNext(index: number) {
-  store.addTaskAt(props.quadrantId, index)
+  await store.addTaskAt(props.quadrantId, index)
   await nextTick()
   itemRefs.value[index + 1]?.focus()
 }

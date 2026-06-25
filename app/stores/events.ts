@@ -17,8 +17,6 @@ export const EVENT_COLOR_BG: Record<string, string> = {
   '#888888': 'rgba(136,136,136,0.12)',
 }
 
-const STORAGE_KEY = 'meridian_events_v1'
-
 function todayKey(): string {
   const d = new Date()
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -49,30 +47,27 @@ export const useEventsStore = defineStore('events', {
       ),
   },
   actions: {
-    load() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY)
-        if (raw) {
-          const parsed = JSON.parse(raw) as { events?: CalendarEvent[] }
-          this.events = parsed.events ?? []
-        }
-      } catch { /* ignore */ }
+    async fetch() {
+      this.events = await $fetch<CalendarEvent[]>('/api/events')
     },
-    save() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ events: this.events }))
+    async addEvent(event: Omit<CalendarEvent, 'id'>) {
+      const created = await $fetch<CalendarEvent>('/api/events', {
+        method: 'POST',
+        body: event,
+      })
+      this.events.push(created)
     },
-    addEvent(event: Omit<CalendarEvent, 'id'>) {
-      this.events.push({ ...event, id: Date.now().toString() })
-      this.save()
+    async updateEvent(updated: CalendarEvent) {
+      const result = await $fetch<CalendarEvent>(`/api/events/${updated.id}`, {
+        method: 'PUT',
+        body: updated,
+      })
+      const idx = this.events.findIndex(e => e.id === result.id)
+      if (idx !== -1) this.events[idx] = result
     },
-    updateEvent(updated: CalendarEvent) {
-      const idx = this.events.findIndex(e => e.id === updated.id)
-      if (idx !== -1) this.events[idx] = updated
-      this.save()
-    },
-    deleteEvent(id: string) {
+    async deleteEvent(id: string) {
+      await $fetch(`/api/events/${id}`, { method: 'DELETE' })
       this.events = this.events.filter(e => e.id !== id)
-      this.save()
     },
     setCurrentDate(date: string) {
       this.currentDate = date
