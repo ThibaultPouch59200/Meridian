@@ -6,3 +6,19 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { useEventsStore } from '~/stores/events'
+import { useGoogleStore } from '~/stores/google'
+
+const eventsStore = useEventsStore()
+const googleStore = useGoogleStore()
+
+onMounted(async () => {
+  await googleStore.fetchStatus()
+  if (googleStore.isConnected) {
+    await googleStore.sync()
+    await eventsStore.fetch()
+  }
+})
+</script>

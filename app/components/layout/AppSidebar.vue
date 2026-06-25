@@ -10,6 +10,12 @@
     <IconButton title="Matrice" :active="route.path.startsWith('/matrix')" @click="navigateTo('/matrix')">
       <IconMatrix />
     </IconButton>
+    <!-- Settings icon pinned to bottom -->
+    <div class="absolute bottom-4">
+      <IconButton title="Settings" :active="route.path.startsWith('/settings')" @click="navigateTo('/settings')">
+        <IconSettings />
+      </IconButton>
+    </div>
   </nav>
 
   <!-- Mobile: barre fixe en bas -->
@@ -33,6 +39,16 @@
     >
       <IconMatrix />
       <span class="text-[9px] font-semibold tracking-[0.5px] uppercase">Matrix</span>
+    </button>
+    <button
+      :class="[
+        'flex flex-col items-center gap-1 p-2 transition-colors',
+        route.path.startsWith('/settings') ? 'text-black' : 'text-gray-400',
+      ]"
+      @click="navigateTo('/settings')"
+    >
+      <IconSettings />
+      <span class="text-[9px] font-semibold tracking-[0.5px] uppercase">Settings</span>
     </button>
   </nav>
 </template>
