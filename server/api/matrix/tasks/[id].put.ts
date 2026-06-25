@@ -1,5 +1,5 @@
-import { useDb } from '../../../../db'
-import { tasks } from '../../../../db/schema'
+import { useDb } from '../../../db'
+import { tasks } from '../../../db/schema'
 import { eq } from 'drizzle-orm'
 import type { Task } from '~~/types'
 

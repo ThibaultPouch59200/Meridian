@@ -1,5 +1,5 @@
-import { useDb } from '../../../db'
-import { events } from '../../../db/schema'
+import { useDb } from '../../db'
+import { events } from '../../db/schema'
 import { eq } from 'drizzle-orm'
 import type { CalendarEvent } from '~~/types'
 
