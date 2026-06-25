@@ -59,16 +59,23 @@ export function useDb() {
       googleAccountId TEXT NOT NULL,
       name TEXT NOT NULL,
       color TEXT NOT NULL,
-      selected INTEGER NOT NULL DEFAULT 0
+      selected INTEGER NOT NULL DEFAULT 0,
+      FOREIGN KEY (googleAccountId) REFERENCES google_accounts(id)
     );
 
     INSERT OR IGNORE INTO matrix_notes (id, content) VALUES (1, '');
   `)
 
   // Migrate existing events table if columns are missing
-  try { sqlite.exec(`ALTER TABLE events ADD COLUMN source TEXT NOT NULL DEFAULT 'meridian'`) } catch {}
-  try { sqlite.exec(`ALTER TABLE events ADD COLUMN googleEventId TEXT`) } catch {}
-  try { sqlite.exec(`ALTER TABLE events ADD COLUMN googleCalendarId TEXT`) } catch {}
+  try { sqlite.exec(`ALTER TABLE events ADD COLUMN source TEXT NOT NULL DEFAULT 'meridian'`) } catch (e: unknown) {
+    if (!(e instanceof Error) || !e.message.includes('duplicate column name')) throw e
+  }
+  try { sqlite.exec(`ALTER TABLE events ADD COLUMN googleEventId TEXT`) } catch (e: unknown) {
+    if (!(e instanceof Error) || !e.message.includes('duplicate column name')) throw e
+  }
+  try { sqlite.exec(`ALTER TABLE events ADD COLUMN googleCalendarId TEXT`) } catch (e: unknown) {
+    if (!(e instanceof Error) || !e.message.includes('duplicate column name')) throw e
+  }
 
   _db = drizzle(sqlite, { schema })
   return _db

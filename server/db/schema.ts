@@ -42,7 +42,7 @@ export const googleAccounts = sqliteTable('google_accounts', {
 
 export const googleCalendars = sqliteTable('google_calendars', {
   id: text('id').primaryKey(),
-  googleAccountId: text('googleAccountId').notNull(),
+  googleAccountId: text('googleAccountId').notNull().references(() => googleAccounts.id),
   name: text('name').notNull(),
   color: text('color').notNull(),
   selected: integer('selected').notNull().default(0),

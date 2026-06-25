@@ -18,6 +18,7 @@ export default defineEventHandler(async (event) => {
     color: body.color,
     tag: body.tag,
     allDay: body.allDay ? 1 : 0,
+    source: 'meridian',
   }).run()
   return { ...body, id, allDay: body.allDay || undefined }
 })

@@ -267,6 +267,7 @@ function submit() {
       location: form.location || undefined,
       color: form.color,
       tag: form.tag,
+      source: 'meridian',
     })
   } else {
     if (!form.start || !form.end) return
@@ -284,6 +285,7 @@ function submit() {
       location: form.location || undefined,
       color: form.color,
       tag: form.tag,
+      source: 'meridian',
     })
   }
   emit('update:open', false)
