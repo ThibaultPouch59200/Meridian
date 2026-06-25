@@ -1,0 +1,17 @@
+{
+  "name": "Meridian",
+  "short_name": "Meridian",
+  "description": "Day planner personnel — Timeline & Matrice Eisenhower",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f8f6",
+  "theme_color": "#0d0d0d",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
