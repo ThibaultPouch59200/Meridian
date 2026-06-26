@@ -27,7 +27,7 @@
 
       <div
         v-if="isDragging"
-        class="absolute left-2 right-4 rounded border border-blue-300 bg-blue-50/60 pointer-events-none"
+        class="absolute left-2 right-4 rounded border border-blue-300 dark:border-blue-400 bg-blue-50/60 dark:bg-blue-900/30 pointer-events-none"
         :style="{ top: `${dragPreviewTop}px`, height: `${dragPreviewHeight}px` }"
       />
     </div>
