@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col h-screen overflow-hidden">
     <!-- Header -->
-    <header class="border-b border-gray-200 flex-shrink-0">
+    <header class="border-b border-gray-200 dark:border-[#2e2e2e] flex-shrink-0">
       <!-- Ligne 1 : titre + bouton Ajouter -->
       <div class="flex items-center justify-between px-4 sm:px-7 sm:pl-6 pt-[14px] pb-2 sm:pb-[14px]">
         <div class="flex items-center gap-4">
@@ -15,7 +15,7 @@
           <!-- Navigation date : visible sur desktop ici, caché sur mobile -->
           <div class="hidden sm:flex items-center gap-[10px]">
             <button
-              class="w-7 h-7 border border-gray-200 rounded-[4px] flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:text-black transition-all bg-transparent cursor-pointer"
+              class="w-7 h-7 border border-gray-200 dark:border-[#2e2e2e] rounded-[4px] flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#252525] hover:text-black dark:hover:text-[#f0f0ee] transition-all bg-transparent cursor-pointer"
               @click="navigate(-1)"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-3.5 h-3.5" style="stroke-width:1.8">
@@ -24,7 +24,7 @@
             </button>
             <span class="text-[13px] font-medium min-w-[160px] text-center">{{ dateLabel }}</span>
             <button
-              class="w-7 h-7 border border-gray-200 rounded-[4px] flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:text-black transition-all bg-transparent cursor-pointer"
+              class="w-7 h-7 border border-gray-200 dark:border-[#2e2e2e] rounded-[4px] flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#252525] hover:text-black dark:hover:text-[#f0f0ee] transition-all bg-transparent cursor-pointer"
               @click="navigate(1)"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-3.5 h-3.5" style="stroke-width:1.8">
@@ -32,7 +32,7 @@
               </svg>
             </button>
             <button
-              class="px-3 py-[5px] text-[11px] font-medium border border-gray-200 rounded-[4px] tracking-[0.3px] text-gray-600 hover:bg-gray-50 hover:text-black transition-all bg-transparent cursor-pointer font-sans"
+              class="px-3 py-[5px] text-[11px] font-medium border border-gray-200 dark:border-[#2e2e2e] rounded-[4px] tracking-[0.3px] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#252525] hover:text-black dark:hover:text-[#f0f0ee] transition-all bg-transparent cursor-pointer font-sans"
               @click="goToday"
             >
               Aujourd'hui
@@ -53,7 +53,7 @@
         <TimelineToggle />
         <div class="flex items-center gap-[10px]">
           <button
-            class="w-7 h-7 border border-gray-200 rounded-[4px] flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:text-black transition-all bg-transparent cursor-pointer"
+            class="w-7 h-7 border border-gray-200 dark:border-[#2e2e2e] rounded-[4px] flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#252525] hover:text-black dark:hover:text-[#f0f0ee] transition-all bg-transparent cursor-pointer"
             @click="navigate(-1)"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-3.5 h-3.5" style="stroke-width:1.8">
@@ -62,7 +62,7 @@
           </button>
           <span class="text-[13px] font-medium min-w-[120px] text-center">{{ dateLabel }}</span>
           <button
-            class="w-7 h-7 border border-gray-200 rounded-[4px] flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:text-black transition-all bg-transparent cursor-pointer"
+            class="w-7 h-7 border border-gray-200 dark:border-[#2e2e2e] rounded-[4px] flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#252525] hover:text-black dark:hover:text-[#f0f0ee] transition-all bg-transparent cursor-pointer"
             @click="navigate(1)"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-3.5 h-3.5" style="stroke-width:1.8">
@@ -76,7 +76,7 @@
     <!-- All-day / multi-day band (day view only) -->
     <div
       v-if="store.timelineMode === 'day' && store.allDayEvents.length"
-      class="flex-shrink-0 border-b border-gray-200 px-6 py-2 flex flex-col gap-[3px]"
+      class="flex-shrink-0 border-b border-gray-200 dark:border-[#2e2e2e] px-6 py-2 flex flex-col gap-[3px]"
     >
       <div
         v-for="event in store.allDayEvents"

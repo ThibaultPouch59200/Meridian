@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex items-stretch border-b border-gray-100"
+    class="flex items-stretch border-b border-gray-100 dark:border-[#252525]"
     :style="`height: ${HOUR_ROW_PX}px`"
     :data-hour="hour"
   >
@@ -9,7 +9,7 @@
     </div>
     <div class="flex-1 relative pointer-events-none">
       <div class="absolute inset-0 flex flex-col">
-        <div v-for="q in 4" :key="q" class="flex-1 border-b border-gray-100/50 last:border-b-0" />
+        <div v-for="q in 4" :key="q" class="flex-1 border-b border-gray-100/50 dark:border-[#252525]/50 last:border-b-0" />
       </div>
     </div>
   </div>

@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss'
 
 export default {
+  darkMode: 'class',
   content: [
     './app/components/**/*.{js,vue,ts}',
     './app/layouts/**/*.vue',
@@ -16,10 +17,10 @@ export default {
         'gray-400': '#aaaaaa',
         'gray-200': '#dddddd',
         'gray-100': '#f0f0ee',
-        'gray-50': '#f8f8f6',
+        'gray-50':  '#f8f8f6',
       },
       fontFamily: {
-        sans: ['Instrument Sans', 'sans-serif'],
+        sans:    ['Instrument Sans', 'sans-serif'],
         display: ['Instrument Serif', 'serif'],
       },
     },
