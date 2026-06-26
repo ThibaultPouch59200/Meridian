@@ -14,6 +14,10 @@ export default defineEventHandler(async () => {
   console.log('[google/calendars] tokenData:', tokenData ? `accountId=${tokenData.accountId} token=${tokenData.token.slice(0, 20)}...` : 'null')
   if (!tokenData) throw createError({ statusCode: 401, message: 'No Google account linked' })
 
+  const tokenInfo = await globalThis.fetch(`https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${tokenData.token}`)
+  const tokenInfoJson = await tokenInfo.json() as { scope?: string; error?: string }
+  console.log('[google/calendars] token scopes:', tokenInfoJson.scope ?? tokenInfoJson.error)
+
   let resp: { items: GCalListEntry[] }
   try {
     resp = await callGoogleApi<{ items: GCalListEntry[] }>(
