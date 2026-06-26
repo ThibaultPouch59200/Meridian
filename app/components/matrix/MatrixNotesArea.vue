@@ -3,7 +3,7 @@
     <div class="section-label mb-[6px] flex-shrink-0">Notes + Ideas</div>
     <textarea
       :value="store.notes"
-      class="w-full flex-1 resize-none border-none outline-none font-sans text-[11px] text-black leading-[1.8] bg-transparent"
+      class="w-full flex-1 resize-none border-none outline-none font-sans text-[11px] text-black dark:text-[#f0f0ee] leading-[1.8] bg-transparent placeholder:text-gray-400 dark:placeholder:text-[#555555]"
       placeholder="Idées, réflexions, références..."
       @input="store.setNotes(($event.target as HTMLTextAreaElement).value)"
     />
