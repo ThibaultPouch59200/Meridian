@@ -1,10 +1,28 @@
 <template>
   <div class="flex flex-col h-screen overflow-hidden">
-    <header class="border-b border-gray-200 flex-shrink-0 px-4 sm:px-7 sm:pl-6 pt-[14px] pb-[14px]">
+    <header class="border-b border-gray-200 dark:border-[#2e2e2e] flex-shrink-0 px-4 sm:px-7 sm:pl-6 pt-[14px] pb-[14px]">
       <span class="font-display text-[20px] font-normal tracking-[-0.3px]">Settings</span>
     </header>
 
     <div class="flex-1 overflow-y-auto px-4 sm:px-7 sm:pl-6 py-6 max-w-[560px]">
+
+      <!-- Apparence -->
+      <div class="mb-8">
+        <p class="section-label mb-3">Apparence</p>
+        <div class="flex gap-1">
+          <button
+            v-for="opt in themeOptions"
+            :key="opt.value"
+            :class="[
+              'px-[10px] py-[5px] text-[11px] font-medium tracking-[0.5px] border rounded-[4px] transition-all font-sans cursor-pointer',
+              themeStore.theme === opt.value
+                ? 'bg-black text-white border-black dark:bg-[#f0f0ee] dark:text-[#0d0d0d] dark:border-[#f0f0ee]'
+                : 'bg-transparent text-gray-600 border-gray-200 hover:bg-gray-50 hover:text-black dark:text-gray-400 dark:border-[#2e2e2e] dark:hover:bg-[#252525] dark:hover:text-[#f0f0ee]',
+            ]"
+            @click="themeStore.setTheme(opt.value)"
+          >{{ opt.label }}</button>
+        </div>
+      </div>
 
       <!-- Google Calendar section -->
       <div class="mb-8">
@@ -12,9 +30,9 @@
 
         <!-- Not connected -->
         <div v-if="!googleStore.isConnected">
-          <div class="border border-gray-200 rounded-md p-4 flex items-center justify-between gap-4">
+          <div class="border border-gray-200 dark:border-[#2e2e2e] rounded-md p-4 flex items-center justify-between gap-4">
             <div>
-              <p class="text-[13px] font-semibold text-black mb-[2px]">Connecter un compte Google</p>
+              <p class="text-[13px] font-semibold text-black dark:text-[#f0f0ee] mb-[2px]">Connecter un compte Google</p>
               <p class="text-[11px] text-gray-400">Importe tes calendriers et synchronise tes événements</p>
             </div>
             <button class="btn-primary whitespace-nowrap flex-shrink-0" @click="connectGoogle">
@@ -26,20 +44,20 @@
         <!-- Connected -->
         <div v-else>
           <!-- Account row -->
-          <div class="border border-gray-200 rounded-md p-3 flex items-center justify-between mb-3">
+          <div class="border border-gray-200 dark:border-[#2e2e2e] rounded-md p-3 flex items-center justify-between mb-3">
             <div class="flex items-center gap-3">
-              <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-[12px] font-bold text-blue-600 flex-shrink-0">
+              <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center text-[12px] font-bold text-blue-600 dark:text-blue-400 flex-shrink-0">
                 {{ googleStore.account!.googleEmail[0]?.toUpperCase() }}
               </div>
               <div>
-                <p class="text-[12px] font-semibold text-black">{{ googleStore.account!.googleEmail }}</p>
+                <p class="text-[12px] font-semibold text-black dark:text-[#f0f0ee]">{{ googleStore.account!.googleEmail }}</p>
                 <p class="text-[10px] text-gray-400">
                   {{ googleStore.lastSyncedAt ? `Dernière sync : ${timeSince(googleStore.lastSyncedAt)}` : 'Non synchronisé' }}
                 </p>
               </div>
             </div>
             <button
-              class="px-3 py-[5px] text-[10px] font-semibold border border-red-300 text-red-500 rounded-[3px] hover:bg-red-50 transition-all bg-transparent cursor-pointer"
+              class="px-3 py-[5px] text-[10px] font-semibold border border-red-300 text-red-500 rounded-[3px] hover:bg-red-50 dark:hover:bg-red-900/20 transition-all bg-transparent cursor-pointer"
               :disabled="disconnecting"
               @click="disconnect"
             >
@@ -59,7 +77,7 @@
               <label
                 v-for="cal in availableCals"
                 :key="cal.id"
-                class="flex items-center gap-3 border border-gray-200 rounded-[5px] p-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                class="flex items-center gap-3 border border-gray-200 dark:border-[#2e2e2e] rounded-[5px] p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-[#252525] transition-colors"
               >
                 <input
                   v-model="cal.selected"
@@ -72,7 +90,7 @@
                   class="w-3 h-3 rounded-full flex-shrink-0"
                   :style="{ background: cal.color }"
                 />
-                <span class="text-[12px] font-medium text-black flex-1">{{ cal.name }}</span>
+                <span class="text-[12px] font-medium text-black dark:text-[#f0f0ee] flex-1">{{ cal.name }}</span>
               </label>
             </div>
             <button
@@ -97,11 +115,11 @@
               <div
                 v-for="cal in googleStore.calendars"
                 :key="cal.id"
-                class="flex items-center justify-between border border-gray-200 rounded-[5px] p-3"
+                class="flex items-center justify-between border border-gray-200 dark:border-[#2e2e2e] rounded-[5px] p-3"
               >
                 <div class="flex items-center gap-3">
                   <span class="w-3 h-3 rounded-full flex-shrink-0" :style="{ background: cal.color }" />
-                  <span class="text-[12px] font-medium text-black">{{ cal.name }}</span>
+                  <span class="text-[12px] font-medium text-black dark:text-[#f0f0ee]">{{ cal.name }}</span>
                 </div>
                 <!-- Color override swatches -->
                 <div class="flex gap-[5px] items-center">
@@ -136,11 +154,19 @@
 <script setup lang="ts">
 import { useGoogleStore } from '~/stores/google'
 import { useEventsStore, EVENT_COLORS } from '~/stores/events'
+import { useThemeStore } from '~/stores/theme'
 
 const googleStore = useGoogleStore()
 const eventsStore = useEventsStore()
+const themeStore = useThemeStore()
 const route = useRoute()
 const router = useRouter()
+
+const themeOptions = [
+  { value: 'light' as const, label: 'Clair' },
+  { value: 'system' as const, label: 'Système' },
+  { value: 'dark' as const, label: 'Sombre' },
+]
 
 const disconnecting = ref(false)
 const loadingCals = ref(false)
