@@ -12,16 +12,16 @@
     </div>
     <!-- Days grid -->
     <div
-      class="grid grid-cols-7 gap-px bg-gray-200 border border-gray-200 overflow-hidden flex-1"
+      class="grid grid-cols-7 gap-px bg-gray-200 dark:bg-[#2e2e2e] border border-gray-200 dark:border-[#2e2e2e] overflow-hidden flex-1"
       style="grid-template-rows: repeat(6, 1fr)"
     >
       <div
         v-for="cell in cells"
         :key="cell.key"
         :class="[
-          'bg-white p-2 cursor-pointer flex flex-col gap-[3px] overflow-hidden transition-colors duration-150 hover:bg-gray-50',
-          !cell.currentMonth && 'bg-gray-50',
-          cell.isSelected && 'outline outline-2 -outline-offset-2 outline-black',
+          'bg-white dark:bg-[#1a1a1a] p-2 cursor-pointer flex flex-col gap-[3px] overflow-hidden transition-colors duration-150 hover:bg-gray-50 dark:hover:bg-[#252525]',
+          !cell.currentMonth && 'bg-gray-50 dark:bg-[#161616]',
+          cell.isSelected && 'outline outline-2 -outline-offset-2 outline-black dark:outline-[#f0f0ee]',
         ]"
         @click="$emit('select-date', cell.key)"
       >
@@ -30,7 +30,7 @@
             'text-xs font-medium leading-[22px]',
             !cell.currentMonth && 'text-gray-400',
             cell.isToday
-              ? 'bg-black text-white w-[22px] h-[22px] rounded-full flex items-center justify-center text-[11px] font-semibold'
+              ? 'bg-black dark:bg-[#f0f0ee] text-white dark:text-[#0d0d0d] w-[22px] h-[22px] rounded-full flex items-center justify-center text-[11px] font-semibold'
               : '',
           ]"
         >
