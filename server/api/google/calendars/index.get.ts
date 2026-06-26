@@ -1,6 +1,6 @@
-import { useDb } from '../../db'
-import { googleCalendars } from '../../db/schema'
-import { getValidAccessToken, callGoogleApi } from '../../utils/google'
+import { useDb } from '../../../db'
+import { googleCalendars } from '../../../db/schema'
+import { getValidAccessToken, callGoogleApi } from '../../../utils/google'
 
 interface GCalListEntry {
   id: string
