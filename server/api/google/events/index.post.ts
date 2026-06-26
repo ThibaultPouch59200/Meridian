@@ -13,7 +13,7 @@ async function ensureMeridianCalendar(token: string, accountId: string): Promise
 
   const list = await callGoogleApi<{ items: { id: string; summary: string }[] }>(
     'GET',
-    'https://www.googleapis.com/calendar/v3/calendarList',
+    'https://www.googleapis.com/calendar/v3/users/me/calendarList',
     token,
   )
   const existing = (list.items ?? []).find(c => c.summary === 'Meridian')
