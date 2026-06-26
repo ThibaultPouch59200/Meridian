@@ -46,12 +46,21 @@ export async function callGoogleApi<T>(
   token: string,
   body?: unknown,
 ): Promise<T> {
-  return $fetch<T>(url, {
+  const response = await globalThis.fetch(url, {
     method,
     headers: {
       Authorization: `Bearer ${token}`,
+      Accept: 'application/json',
       ...(body ? { 'Content-Type': 'application/json' } : {}),
     },
     body: body !== undefined ? JSON.stringify(body) : undefined,
   })
+
+  const text = await response.text()
+  console.log(`[callGoogleApi] ${method} ${url} → ${response.status} (${response.headers.get('content-type')})`)
+  if (!response.ok) {
+    console.error(`[callGoogleApi] response body (first 500 chars):`, text.slice(0, 500))
+    throw createError({ statusCode: response.status, message: `Google API ${response.status}: ${text.slice(0, 200)}` })
+  }
+  return JSON.parse(text) as T
 }
