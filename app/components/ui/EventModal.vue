@@ -26,9 +26,20 @@
             </svg>
           </button>
 
-          <h2 class="font-display text-[18px] font-normal tracking-[-0.2px] mb-5">
+          <h2 class="font-display text-[18px] font-normal tracking-[-0.2px] mb-3">
             {{ isEditing ? 'Modifier l\'événement' : 'Nouvel événement' }}
           </h2>
+
+          <!-- Google source badge -->
+          <div v-if="isGoogleEvent" class="flex items-center gap-2 mb-4">
+            <span
+              class="w-2 h-2 rounded-full flex-shrink-0"
+              :style="{ background: props.initialEvent?.color }"
+            />
+            <span class="text-[10px] text-gray-500 font-medium">
+              {{ googleCalendarName }} · Google Calendar
+            </span>
+          </div>
 
           <div class="flex flex-col gap-[5px] mb-[14px]">
             <label class="text-[9px] font-semibold tracking-[1.2px] uppercase text-gray-400">Nom</label>
@@ -85,9 +96,10 @@
             <input v-model="form.location" class="form-input" placeholder="Bureau, maison, en ligne..." />
           </div>
 
+          <!-- Color: editable for Meridian, locked for Google -->
           <div class="flex flex-col gap-[5px] mb-[14px]">
             <label class="text-[9px] font-semibold tracking-[1.2px] uppercase text-gray-400">Couleur</label>
-            <div class="flex gap-2 items-center">
+            <div v-if="!isGoogleEvent" class="flex gap-2 items-center">
               <ColorSwatch
                 v-for="c in EVENT_COLORS"
                 :key="c"
@@ -96,9 +108,14 @@
                 @select="form.color = $event"
               />
             </div>
+            <div v-else class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full flex-shrink-0" :style="{ background: form.color }" />
+              <span class="text-[10px] text-gray-400">Définie dans Settings → Calendriers</span>
+            </div>
           </div>
 
-          <div class="flex flex-col gap-[5px] mb-[14px]">
+          <!-- Tag: hidden for Google events -->
+          <div v-if="!isGoogleEvent" class="flex flex-col gap-[5px] mb-[14px]">
             <label class="text-[9px] font-semibold tracking-[1.2px] uppercase text-gray-400">Tag</label>
             <div class="flex gap-[6px] flex-wrap items-center">
               <TagChip
@@ -137,7 +154,9 @@
             >
               Annuler
             </button>
-            <button class="btn-primary" @click="submit">Enregistrer</button>
+            <button class="btn-primary" @click="submit">
+              {{ isGoogleEvent ? 'Sauvegarder sur Google' : 'Enregistrer' }}
+            </button>
           </div>
         </div>
       </div>
@@ -149,6 +168,7 @@
 import type { CalendarEvent } from '~~/types'
 import { EVENT_COLORS } from '~/stores/events'
 import { useTagsStore } from '~/stores/tags'
+import { useGoogleStore } from '~/stores/google'
 
 const props = defineProps<{
   open: boolean
@@ -164,12 +184,18 @@ const emit = defineEmits<{
 }>()
 
 const tagsStore = useTagsStore()
+const googleStore = useGoogleStore()
 const addingTag = ref(false)
 const newTagValue = ref('')
 const tagInputRef = ref<HTMLInputElement>()
 const nameRef = ref<HTMLInputElement>()
 
 const isEditing = computed(() => !!props.initialEvent)
+const isGoogleEvent = computed(() => props.initialEvent?.source === 'google')
+const googleCalendarName = computed(() => {
+  if (!props.initialEvent?.googleCalendarId) return 'Google Calendar'
+  return googleStore.calendars.find(c => c.id === props.initialEvent?.googleCalendarId)?.name ?? 'Google Calendar'
+})
 
 const form = reactive({
   name: '',
@@ -252,6 +278,11 @@ function confirmNewTag() {
 
 function submit() {
   if (!form.name.trim()) return
+  const googleFields = {
+    source: props.initialEvent?.source ?? 'meridian' as const,
+    googleEventId: props.initialEvent?.googleEventId,
+    googleCalendarId: props.initialEvent?.googleCalendarId,
+  }
   if (form.allDay) {
     if (!form.startDate) return
     const endDate = form.endDate || form.startDate
@@ -267,7 +298,7 @@ function submit() {
       location: form.location || undefined,
       color: form.color,
       tag: form.tag,
-      source: 'meridian',
+      ...googleFields,
     })
   } else {
     if (!form.start || !form.end) return
@@ -285,7 +316,7 @@ function submit() {
       location: form.location || undefined,
       color: form.color,
       tag: form.tag,
-      source: 'meridian',
+      ...googleFields,
     })
   }
   emit('update:open', false)

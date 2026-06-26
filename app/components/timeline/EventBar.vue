@@ -11,6 +11,13 @@
     <span class="text-[10px] font-medium opacity-70 whitespace-nowrap tabular-nums">
       {{ event.startTime }} – {{ event.endTime }}
     </span>
+    <!-- Source badge -->
+    <span
+      class="text-[8px] font-bold flex-shrink-0 px-[4px] py-[1px] rounded-[2px] leading-tight"
+      :style="{ background: 'currentColor' }"
+    >
+      <span style="color: white; mix-blend-mode: normal">{{ event.source === 'google' ? 'G' : 'M' }}</span>
+    </span>
     <span class="text-xs font-medium flex-1 truncate">{{ event.name }}</span>
     <span
       v-if="event.tag"
@@ -40,5 +47,5 @@ defineEmits<{
   delete: [id: string]
 }>()
 
-const colorBg = computed(() => EVENT_COLOR_BG[props.event.color] ?? 'rgba(74,144,217,0.12)')
+const colorBg = computed(() => EVENT_COLOR_BG[props.event.color] ?? `${props.event.color}20`)
 </script>

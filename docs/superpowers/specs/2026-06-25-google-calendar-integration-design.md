@@ -7,7 +7,7 @@
 
 ## Résumé
 
-Intégration bidirectionnelle avec Google Calendar : import des calendriers Google dans Meridian, synchronisation au chargement, write-back des modifications vers Google, et page Settings dédiée pour gérer la connexion et les calendriers.
+Intégration bidirectionnelle avec Google Calendar : import des calendriers Google dans Meridian, synchronisation au chargement ou à la modification / création d'un event, write-back des modifications vers Google, et page Settings dédiée pour gérer la connexion et les calendriers.
 
 ---
 
@@ -16,9 +16,9 @@ Intégration bidirectionnelle avec Google Calendar : import des calendriers Goog
 | Question | Décision |
 |---|---|
 | Comptes Google | Un seul par instance pour l'instant, structure multi-compte préparée en base |
-| Sync | Au chargement de l'app (`onMounted` du layout) |
+| Sync | Au chargement de l'app (`onMounted` du layout) ou lors d'une modification / création d'un event |
 | Sélection des calendriers | Manuelle au moment du link (étape post-OAuth) |
-| Rendu visuel | Identique aux events Meridian, couleur issue du calendrier Google |
+| Rendu visuel | Identique aux events Meridian juste on a tag avec le logo soit google ou meridian avant leur nom, couleur issue du calendrier Google |
 | Couleur | Verrouillée dans EventModal, modifiable uniquement depuis `/settings` |
 | Édition | Bidirectionnelle — modifs Meridian pushées vers Google Calendar API |
 | Settings | Page `/settings` dédiée, icône ⚙ dans la sidebar |
