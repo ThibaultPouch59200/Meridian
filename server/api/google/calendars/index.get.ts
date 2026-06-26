@@ -9,14 +9,24 @@ interface GCalListEntry {
 }
 
 export default defineEventHandler(async () => {
+  console.log('[google/calendars] handler reached')
   const tokenData = await getValidAccessToken()
+  console.log('[google/calendars] tokenData:', tokenData ? `accountId=${tokenData.accountId}` : 'null')
   if (!tokenData) throw createError({ statusCode: 401, message: 'No Google account linked' })
 
-  const resp = await callGoogleApi<{ items: GCalListEntry[] }>(
-    'GET',
-    'https://www.googleapis.com/calendar/v3/calendarList',
-    tokenData.token,
-  )
+  let resp: { items: GCalListEntry[] }
+  try {
+    resp = await callGoogleApi<{ items: GCalListEntry[] }>(
+      'GET',
+      'https://www.googleapis.com/calendar/v3/calendarList',
+      tokenData.token,
+    )
+    console.log('[google/calendars] Google API returned', resp.items?.length ?? 0, 'calendars')
+  }
+  catch (e) {
+    console.error('[google/calendars] Google API error:', e)
+    throw e
+  }
 
   const db = useDb()
   const saved = db.select().from(googleCalendars).all()
