@@ -11,7 +11,7 @@ interface GCalListEntry {
 export default defineEventHandler(async () => {
   console.log('[google/calendars] handler reached')
   const tokenData = await getValidAccessToken()
-  console.log('[google/calendars] tokenData:', tokenData ? `accountId=${tokenData.accountId}` : 'null')
+  console.log('[google/calendars] tokenData:', tokenData ? `accountId=${tokenData.accountId} token=${tokenData.token.slice(0, 20)}...` : 'null')
   if (!tokenData) throw createError({ statusCode: 401, message: 'No Google account linked' })
 
   let resp: { items: GCalListEntry[] }
@@ -23,8 +23,9 @@ export default defineEventHandler(async () => {
     )
     console.log('[google/calendars] Google API returned', resp.items?.length ?? 0, 'calendars')
   }
-  catch (e) {
-    console.error('[google/calendars] Google API error:', e)
+  catch (e: unknown) {
+    const err = e as { statusCode?: number; data?: unknown; message?: string }
+    console.error('[google/calendars] Google API error status:', err.statusCode, 'data:', JSON.stringify(err.data ?? err.message))
     throw e
   }
 
