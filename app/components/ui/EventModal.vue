@@ -14,11 +14,11 @@
         @click.self="$emit('update:open', false)"
       >
         <div
-          class="bg-white sm:border sm:border-gray-200 sm:rounded-md sm:w-[440px] w-full rounded-t-2xl px-7 pt-7 pb-6 relative shadow-[0_8px_32px_rgba(0,0,0,0.1)] max-h-[90vh] overflow-y-auto sm:max-h-none sm:overflow-visible"
+          class="bg-white dark:bg-[#222222] sm:border sm:border-gray-200 dark:sm:border-[#3a3a3a] sm:rounded-md sm:w-[440px] w-full rounded-t-2xl px-7 pt-7 pb-6 relative shadow-[0_8px_32px_rgba(0,0,0,0.1)] max-h-[90vh] overflow-y-auto sm:max-h-none sm:overflow-visible"
           style="animation: modalIn 0.15s ease"
         >
           <button
-            class="absolute top-4 right-4 w-[26px] h-[26px] border border-gray-200 rounded flex items-center justify-center text-gray-400 hover:text-black hover:bg-gray-50 transition-all bg-transparent cursor-pointer"
+            class="absolute top-4 right-4 w-[26px] h-[26px] border border-gray-200 dark:border-[#2e2e2e] rounded flex items-center justify-center text-gray-400 hover:text-black dark:hover:text-[#f0f0ee] hover:bg-gray-50 dark:hover:bg-[#2e2e2e] transition-all bg-transparent cursor-pointer"
             @click="$emit('update:open', false)"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-3 h-3" style="stroke-width:2">
@@ -36,7 +36,7 @@
               class="w-2 h-2 rounded-full flex-shrink-0"
               :style="{ background: props.initialEvent?.color }"
             />
-            <span class="text-[10px] text-gray-500 font-medium">
+            <span class="text-[10px] text-gray-400 font-medium">
               {{ googleCalendarName }} · Google Calendar
             </span>
           </div>
@@ -65,7 +65,7 @@
               class="w-[13px] h-[13px] cursor-pointer accent-black"
               @change="onAllDayChange"
             />
-            <label for="allDay" class="text-[11px] font-medium text-gray-600 cursor-pointer select-none">
+            <label for="allDay" class="text-[11px] font-medium text-gray-600 dark:text-gray-400 cursor-pointer select-none">
               Journée entière
             </label>
           </div>
@@ -127,7 +127,7 @@
               />
               <template v-if="!addingTag">
                 <button
-                  class="px-[10px] py-1 rounded-[3px] text-[10px] font-semibold tracking-[0.5px] border border-dashed border-gray-200 text-gray-400 hover:text-black hover:border-black transition-all font-sans bg-transparent cursor-pointer"
+                  class="px-[10px] py-1 rounded-[3px] text-[10px] font-semibold tracking-[0.5px] border border-dashed border-gray-200 dark:border-[#2e2e2e] text-gray-400 hover:text-black dark:hover:text-[#f0f0ee] hover:border-black dark:hover:border-[#f0f0ee] transition-all font-sans bg-transparent cursor-pointer"
                   @click="startAddTag"
                 >
                   + Tag
@@ -137,7 +137,7 @@
                 <input
                   ref="tagInputRef"
                   v-model="newTagValue"
-                  class="border border-dashed border-gray-200 rounded-[3px] px-2 py-1 text-[10px] w-[100px] outline-none focus:border-black transition-colors font-sans"
+                  class="border border-dashed border-gray-200 dark:border-[#2e2e2e] rounded-[3px] px-2 py-1 text-[10px] w-[100px] outline-none focus:border-black dark:focus:border-[#f0f0ee] transition-colors font-sans bg-transparent dark:text-[#f0f0ee]"
                   placeholder="Nouveau tag..."
                   maxlength="20"
                   @keydown.enter="confirmNewTag"
@@ -147,9 +147,9 @@
             </div>
           </div>
 
-          <div class="flex justify-end gap-2 mt-5 pt-4 border-t border-gray-100">
+          <div class="flex justify-end gap-2 mt-5 pt-4 border-t border-gray-100 dark:border-[#252525]">
             <button
-              class="px-4 py-[7px] text-xs border border-gray-200 rounded-[3px] text-gray-600 hover:bg-gray-50 transition-all font-sans bg-transparent cursor-pointer"
+              class="px-4 py-[7px] text-xs border border-gray-200 dark:border-[#2e2e2e] rounded-[3px] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#252525] transition-all font-sans bg-transparent cursor-pointer"
               @click="$emit('update:open', false)"
             >
               Annuler
