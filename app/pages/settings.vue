@@ -51,6 +51,10 @@
           <div v-if="route.query.step === 'calendars'" class="mb-4">
             <p class="section-label mb-2">Sélectionne tes calendriers</p>
             <div v-if="loadingCals" class="text-[11px] text-gray-400 py-2">Chargement…</div>
+            <div v-else-if="calsError" class="text-[11px] text-red-500 py-2 flex items-start gap-2">
+              <span class="flex-1">Impossible de charger les calendriers : {{ calsError }}</span>
+              <button class="underline cursor-pointer bg-transparent border-none text-red-400 flex-shrink-0" @click="fetchAvailableCals">Réessayer</button>
+            </div>
             <div v-else class="flex flex-col gap-2">
               <label
                 v-for="cal in availableCals"
@@ -142,18 +146,37 @@ const disconnecting = ref(false)
 const loadingCals = ref(false)
 const savingCals = ref(false)
 const availableCals = ref<Array<{ id: string; name: string; color: string; selected: number }>>([])
+const calsError = ref<string | null>(null)
 
-onMounted(async () => {
+async function fetchAvailableCals() {
+  loadingCals.value = true
+  calsError.value = null
+  try {
+    availableCals.value = await $fetch('/api/google/calendars')
+  }
+  catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e)
+    calsError.value = msg
+  }
+  finally {
+    loadingCals.value = false
+  }
+}
+
+onMounted(() => {
   if (route.query.step === 'calendars') {
-    loadingCals.value = true
-    try {
-      availableCals.value = await $fetch('/api/google/calendars')
-    }
-    finally {
-      loadingCals.value = false
-    }
+    fetchAvailableCals()
   }
 })
+
+watch(
+  () => googleStore.isConnected,
+  (connected) => {
+    if (connected && route.query.step === 'calendars' && availableCals.value.length === 0 && !loadingCals.value) {
+      fetchAvailableCals()
+    }
+  },
+)
 
 function connectGoogle() {
   window.location.href = '/api/auth/google/redirect'
