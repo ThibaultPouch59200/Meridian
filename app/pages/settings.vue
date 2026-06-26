@@ -155,7 +155,6 @@ async function fetchAvailableCals() {
     availableCals.value = await $fetch('/api/google/calendars')
   }
   catch (e: unknown) {
-    console.error('[settings] fetchAvailableCals error:', e)
     const msg = e instanceof Error ? e.message : String(e)
     calsError.value = msg
   }

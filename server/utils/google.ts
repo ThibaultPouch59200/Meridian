@@ -57,10 +57,8 @@ export async function callGoogleApi<T>(
   })
 
   const text = await response.text()
-  console.log(`[callGoogleApi] ${method} ${url} → ${response.status} (${response.headers.get('content-type')})`)
   if (!response.ok) {
-    console.error(`[callGoogleApi] response body (first 500 chars):`, text.slice(0, 500))
-    throw createError({ statusCode: response.status, message: `Google API ${response.status}: ${text.slice(0, 200)}` })
+    throw createError({ statusCode: response.status, message: `Google API error ${response.status}` })
   }
   return JSON.parse(text) as T
 }
