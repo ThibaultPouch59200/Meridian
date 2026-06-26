@@ -88,6 +88,12 @@
         <span v-if="event.startDate !== event.endDate" class="opacity-60 tabular-nums whitespace-nowrap text-[9px]">
           {{ formatDateShort(event.startDate) }} → {{ formatDateShort(event.endDate) }}
         </span>
+        <span
+          class="text-[8px] font-bold flex-shrink-0 px-[4px] py-[1px] rounded-[2px] leading-tight"
+          :style="{ background: 'currentColor' }"
+        >
+          <span style="color: white">{{ event.source === 'google' ? 'G' : 'M' }}</span>
+        </span>
         <span class="flex-1 truncate">{{ event.name }}</span>
         <span
           v-if="event.tag"
@@ -241,7 +247,13 @@ function openEditEvent(event: CalendarEvent) {
 
 function saveEvent(eventData: Omit<CalendarEvent, 'id'>) {
   if (editingEvent.value) {
-    store.updateEvent({ ...eventData, id: editingEvent.value.id })
+    store.updateEvent({
+      ...eventData,
+      id: editingEvent.value.id,
+      source: editingEvent.value.source,
+      googleEventId: editingEvent.value.googleEventId,
+      googleCalendarId: editingEvent.value.googleCalendarId,
+    })
   } else {
     store.addEvent(eventData)
   }
