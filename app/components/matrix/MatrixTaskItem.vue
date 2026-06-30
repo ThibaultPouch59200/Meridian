@@ -9,7 +9,7 @@
     <span
       v-if="!editing"
       :class="[
-        'text-[11px] flex-1 cursor-text leading-tight min-h-[16px]',
+        'text-[13px] flex-1 cursor-text leading-tight min-h-[16px]',
         task.done ? 'line-through text-gray-400' : 'text-black dark:text-[#f0f0ee]',
       ]"
       @click="startEdit"
@@ -19,7 +19,7 @@
       ref="inputRef"
       v-model="localText"
       type="text"
-      class="text-[11px] flex-1 bg-transparent border-none outline-none border-b border-gray-200 dark:border-[#2e2e2e] text-black dark:text-[#f0f0ee] font-sans leading-tight"
+      class="text-[13px] flex-1 bg-transparent border-none outline-none border-b border-gray-200 dark:border-[#2e2e2e] text-black dark:text-[#f0f0ee] font-sans leading-tight"
       placeholder="Tâche..."
       @blur="commit"
       @keydown.enter.prevent="commitAndAddNext"

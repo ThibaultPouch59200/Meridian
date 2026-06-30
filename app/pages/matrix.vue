@@ -9,7 +9,7 @@
     <template v-if="!isMobile">
       <div class="flex-1 flex overflow-hidden min-h-0">
         <div class="w-5 flex items-center justify-center flex-shrink-0">
-          <span class="-rotate-90 text-[8px] tracking-[2px] uppercase text-gray-400 dark:text-[#555555] font-semibold whitespace-nowrap pointer-events-none select-none">IMPORTANCE</span>
+          <span class="-rotate-90 text-[10px] tracking-[2px] uppercase text-gray-400 dark:text-[#555555] font-semibold whitespace-nowrap pointer-events-none select-none">IMPORTANCE</span>
         </div>
 
         <div
@@ -48,7 +48,7 @@
         </div>
       </div>
 
-      <div class="flex items-center justify-center gap-2 text-[8px] tracking-[2px] uppercase text-gray-300 dark:text-[#555555] font-semibold py-1 border-t border-gray-200 dark:border-[#2e2e2e] flex-shrink-0">
+      <div class="flex items-center justify-center gap-2 text-[10px] tracking-[2px] uppercase text-gray-300 dark:text-[#555555] font-semibold py-1 border-t border-gray-200 dark:border-[#2e2e2e] flex-shrink-0">
         <span class="text-sm leading-none">−</span>
         URGENCY
         <span class="text-sm leading-none">+</span>
