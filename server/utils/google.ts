@@ -1,6 +1,7 @@
 import { useDb } from '../db'
-import { googleAccounts } from '../db/schema'
-import { eq } from 'drizzle-orm'
+import { googleAccounts, events } from '../db/schema'
+import { eq, isNull } from 'drizzle-orm'
+import type { CalendarEvent } from '~~/types'
 
 const TOKEN_REFRESH_BUFFER_MS = 60_000
 
@@ -38,6 +39,91 @@ export async function getValidAccessToken(): Promise<{ token: string; accountId:
   }
 
   return { token: account.accessToken, accountId: account.id }
+}
+
+export async function ensureMeridianCalendar(token: string, accountId: string): Promise<string> {
+  const db = useDb()
+  const account = db.select().from(googleAccounts).where(eq(googleAccounts.id, accountId)).all()[0]
+  if (!account) throw createError({ statusCode: 500, message: 'Account not found' })
+
+  if (account.meridianCalendarId) return account.meridianCalendarId
+
+  const list = await callGoogleApi<{ items: { id: string; summary: string }[] }>(
+    'GET',
+    'https://www.googleapis.com/calendar/v3/users/me/calendarList',
+    token,
+  )
+  const existing = (list.items ?? []).find(c => c.summary === 'Meridian')
+  if (existing) {
+    db.update(googleAccounts).set({ meridianCalendarId: existing.id })
+      .where(eq(googleAccounts.id, accountId)).run()
+    return existing.id
+  }
+
+  const created = await callGoogleApi<{ id: string }>(
+    'POST',
+    'https://www.googleapis.com/calendar/v3/calendars',
+    token,
+    { summary: 'Meridian' },
+  )
+  db.update(googleAccounts).set({ meridianCalendarId: created.id })
+    .where(eq(googleAccounts.id, accountId)).run()
+  return created.id
+}
+
+export function toGoogleEventBody(e: CalendarEvent) {
+  if (e.allDay) {
+    return {
+      summary: e.name,
+      description: e.desc,
+      location: e.location,
+      start: { date: e.startDate },
+      end: { date: e.endDate },
+    }
+  }
+  return {
+    summary: e.name,
+    description: e.desc,
+    location: e.location,
+    start: { dateTime: `${e.startDate}T${e.startTime}:00` },
+    end: { dateTime: `${e.endDate}T${e.endTime}:00` },
+  }
+}
+
+export async function pushMeridianEventsToGoogle(token: string, accountId: string): Promise<number> {
+  const calId = await ensureMeridianCalendar(token, accountId)
+  const db = useDb()
+
+  const unpushed = db.select().from(events)
+    .where(isNull(events.googleEventId))
+    .all()
+    .filter(e => e.source === 'meridian')
+
+  let pushed = 0
+  for (const e of unpushed) {
+    const eventBody = toGoogleEventBody({
+      ...e,
+      allDay: e.allDay === 1,
+      desc: e.desc ?? undefined,
+      location: e.location ?? undefined,
+      source: 'meridian',
+    })
+    try {
+      const created = await callGoogleApi<{ id: string }>(
+        'POST',
+        `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events`,
+        token,
+        eventBody,
+      )
+      db.update(events)
+        .set({ googleEventId: created.id, googleCalendarId: calId })
+        .where(eq(events.id, e.id))
+        .run()
+      pushed++
+    } catch {}
+  }
+
+  return pushed
 }
 
 export async function callGoogleApi<T>(

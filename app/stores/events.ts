@@ -99,6 +99,12 @@ export const useEventsStore = defineStore('events', {
         } catch {}
       }
     },
+    async pushMeridianToGoogle() {
+      try {
+        await $fetch('/api/google/push-meridian', { method: 'POST' })
+        await this.fetch()
+      } catch {}
+    },
     setCurrentDate(date: string) {
       this.currentDate = date
     },

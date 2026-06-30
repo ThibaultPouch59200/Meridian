@@ -231,7 +231,7 @@ async function saveCalendars() {
       })),
     )
     await googleStore.sync()
-    await eventsStore.fetch()
+    await eventsStore.pushMeridianToGoogle()
     router.replace('/settings')
   }
   finally {
